@@ -1,19 +1,16 @@
 //
-//  ViewController.swift
+//  ExploreViewController.swift
 //  MovieManiac
 //
 //  Created by Bakai Ismailov on 29/12/21.
 //
 
+import Foundation
 import UIKit
 
-class ViewController: UIViewController {
-
+final class ExploreViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        view.backgroundColor = .black
     }
-
-
 }
-
