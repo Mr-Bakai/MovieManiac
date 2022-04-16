@@ -18,7 +18,11 @@ enum EndPoint: String {
 
 class AlamofireManager {
     
-    typealias Completion = (_ response: MovieResponse?, _ error: Error?) -> ()
+    typealias CompletionTopRatedMovies = ((Result<TopRatedMoviesResponse, Error>) -> Void)
+    typealias CompletionPopularMovies = ((Result<PopularMoviesResponse, Error>) -> Void)
+    
+    typealias CompletionUpcomingMovies = ((Result<UpcomingMoviesResponse, Error>) -> Void)
+    typealias CompletionNowPlayingMovies = (_ response: NowPlayingMoviesResponse?, _ error: Error?) -> ()
     
     // baseURL for TMDB
     private static let baseURLTBDM = "https://api.themoviedb.org/3"
@@ -29,7 +33,7 @@ class AlamofireManager {
     
     static let imageBase = "https://image.tmdb.org/t/p/w500"
     
-    func getTopRatedMovies(endPoint: EndPoint, completion: @escaping Completion){
+    func getTopRatedMovies(endPoint: EndPoint, completion: @escaping CompletionTopRatedMovies){
         
         let params = ["api_key" : AlamofireManager.apiKeyTBDM ] as [String:Any]
         AF.request(AlamofireManager.baseURLTBDM + endPoint.rawValue,
@@ -47,21 +51,21 @@ class AlamofireManager {
                 do {
                     
                     let decoder = JSONDecoder()
-                    let response = try decoder.decode(MovieResponse.self, from: data)
-                    completion(response, nil)
+                    let response = try decoder.decode(TopRatedMoviesResponse.self, from: data)
+                    completion(.success(response))
                     
                 } catch let error {
-                    completion(nil, error)
+                    completion(.failure(error))
                 }
                 
             case .failure(let error):
                 print(error)
-                completion(nil, error)
+                completion(.failure(error))
             }
         }
     }
     
-    func getPopular(endPoint: EndPoint, completion: @escaping Completion){
+    func getPopular(endPoint: EndPoint, completion: @escaping CompletionPopularMovies){
         
         let params = ["api_key" : AlamofireManager.apiKeyTBDM ] as [String:Any]
         AF.request(AlamofireManager.baseURLTBDM + endPoint.rawValue,
@@ -75,25 +79,37 @@ class AlamofireManager {
             case .success:
                 print("Success")
                 guard let data = responseJSON.data else { return }
-                
                 do {
                     
                     let decoder = JSONDecoder()
-                    let response = try decoder.decode(MovieResponse.self, from: data)
-                    completion(response, nil)
+                    let response = try decoder.decode(PopularMoviesResponse.self, from: data)
+                    print(response)
+                    completion(.success(response))
                     
-                } catch let error {
-                    completion(nil, error)
+                } catch let DecodingError.dataCorrupted(context) {
+                    print(context)
+                } catch let DecodingError.keyNotFound(key, context) {
+                    print("Key '\(key)' not found:", context.debugDescription)
+                    print("codingPath:", context.codingPath)
+                } catch let DecodingError.valueNotFound(value, context) {
+                    print("Value '\(value)' not found:", context.debugDescription)
+                    print("codingPath:", context.codingPath)
+                } catch let DecodingError.typeMismatch(type, context)  {
+                    print("Type '\(type)' mismatch:", context.debugDescription)
+                    print("codingPath:", context.codingPath)
+                } catch {
+                    print("error: ", error)
+                    completion(.failure(error))
                 }
                 
             case .failure(let error):
                 print(error)
-                completion(nil, error)
+                completion(.failure(error))
             }
         }
     }
     
-    func getUpcoming(endPoint: EndPoint, completion: @escaping Completion){
+    func getUpcoming(endPoint: EndPoint, completion: @escaping CompletionUpcomingMovies){
         
         let params = ["api_key" : AlamofireManager.apiKeyTBDM ] as [String:Any]
         AF.request(AlamofireManager.baseURLTBDM + endPoint.rawValue,
@@ -111,21 +127,21 @@ class AlamofireManager {
                 do {
                     
                     let decoder = JSONDecoder()
-                    let response = try decoder.decode(MovieResponse.self, from: data)
-                    completion(response, nil)
+                    let response = try decoder.decode(UpcomingMoviesResponse.self, from: data)
+                    completion(.success(response))
                     
                 } catch let error {
-                    completion(nil, error)
+                    completion(.failure(error))
                 }
                 
             case .failure(let error):
                 print(error)
-                completion(nil, error)
+                completion(.failure(error))
             }
         }
     }
     
-    func getNowPlaying(endPoint: EndPoint, completion: @escaping Completion){
+    func getNowPlaying(endPoint: EndPoint, completion: @escaping CompletionNowPlayingMovies){
         
         let params = ["api_key" : AlamofireManager.apiKeyTBDM ] as [String:Any]
         AF.request(AlamofireManager.baseURLTBDM + endPoint.rawValue,
@@ -143,7 +159,7 @@ class AlamofireManager {
                 do {
                     
                     let decoder = JSONDecoder()
-                    let response = try decoder.decode(MovieResponse.self, from: data)
+                    let response = try decoder.decode(NowPlayingMoviesResponse.self, from: data)
                     completion(response, nil)
                     
                 } catch let error {

@@ -13,5 +13,4 @@ final class SeriesViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .black
     }
-    
 }

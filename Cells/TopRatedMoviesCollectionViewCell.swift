@@ -1,18 +1,18 @@
 //
-//  MoviesCollectionViewCell.swift
+//  TopRatedMoviesCollectionViewCell.swift
 //  MovieManiac
 //
-//  Created by Bakai Ismailov on 6/1/22.
+//  Created by Bakai Ismailov on 16/4/22.
 //
 
 import UIKit
 import Kingfisher
 import SDWebImage
 
-class MoviesCollectionViewCell: UICollectionViewCell {
+class TopRatedMoviesCollectionViewCell: UICollectionViewCell {
     
     private let imageView = UIImageView()
-    static let identifier = "MoviesCollectionViewCell"
+    static let identifier = "TopRatedMoviesCollectionViewCell"
     private var imageBaseURL = AlamofireManager.imageBase
     
     
@@ -21,7 +21,7 @@ class MoviesCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
         self.contentView.addSubview(imageView)
         imageView.clipsToBounds = true
-        imageView.contentMode = .scaleToFill
+        imageView.contentMode = .scaleAspectFit
     }
     
     required init?(coder: NSCoder) {
@@ -32,14 +32,14 @@ class MoviesCollectionViewCell: UICollectionViewCell {
         setupUI()
     }
     
-    public func configure(with model: PopularMoviesCellViewModel){
+    public func configure(with model: TopRatedMoviesCellViewModel){
         guard let url = model.backdropPath else { return }
         setupImages(with: url)
     }
 }
 
 // MARK: - UI Setup
-extension MoviesCollectionViewCell {
+extension TopRatedMoviesCollectionViewCell {
     
     private func setupUI() {
         imageView.snp.makeConstraints { maker in

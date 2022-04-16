@@ -7,13 +7,20 @@
 
 
 final class MoviesViewModel {
-    private let alamo = AlamofireManager()
+    
+    private let alamofire = AlamofireManager()
     var sendMovie: DataDelegateProtocol? = nil
     
     func getTopRatedMovies(){
-        alamo.getTopRatedMovies(endPoint: .topRated, completion: { (response, error) in
-            guard let res = response else { return }
-            self.sendMovie?.movieResponse(movie: res)
+        alamofire.getTopRatedMovies(endPoint: .topRated, completion: { response in
+            switch response {
+            case .success(let model):
+                self.sendMovie?.movieResponse(movie: model)
+            
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
         })
     }
 }
+

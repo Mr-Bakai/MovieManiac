@@ -8,5 +8,5 @@
 import Foundation
 
 protocol DataDelegateProtocol {
-    func movieResponse(movie: MovieResponse)
+    func movieResponse(movie: TopRatedMoviesResponse)
 }

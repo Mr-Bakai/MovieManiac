@@ -1,16 +1,17 @@
 //
-//  MovieResponse.swift
+//  TopRatedMoviesResponse.swift
 //  MovieManiac
 //
-//  Created by Bakai Ismailov on 6/1/22.
+//  Created by Bakai Ismailov on 10/4/22.
 //
 
 import Foundation
 
-// MARK: - MovieResponse
-class MovieResponse: Codable {
+
+// MARK: - TopRatedMovies
+struct TopRatedMoviesResponse: Codable {
     let page: Int
-    let results: [TopRatedMovies]
+    let results: [TopRatedMovies]?
     let totalPages, totalResults: Int
 
     enum CodingKeys: String, CodingKey {
@@ -20,8 +21,9 @@ class MovieResponse: Codable {
     }
 }
 
+
 // MARK: - Result
-class TopRatedMovies: Codable {
+struct TopRatedMovies: Codable {
     let adult: Bool
     let backdropPath: String
     let genreIDS: [Int]
@@ -49,9 +51,12 @@ class TopRatedMovies: Codable {
     }
 }
 
-extension TopRatedMovies: Equatable {
-    static func == (lhs: TopRatedMovies, rhs: TopRatedMovies) -> Bool {
-        // Two photos are the same if they have the same photoID
-        return lhs.id == rhs.id
-    }
+
+struct TopRatedMoviesCellViewModel: Codable {
+    let backdropPath: String?
+    let id: Int
+    let overview: String
+    let popularity: Double
+    let voteAverage: Double
+    let voteCount: Int
 }

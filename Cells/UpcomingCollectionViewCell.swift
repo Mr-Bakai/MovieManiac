@@ -1,18 +1,18 @@
 //
-//  MoviesCollectionViewCell.swift
+//  UpcomingCollectionViewCell.swift
 //  MovieManiac
 //
-//  Created by Bakai Ismailov on 6/1/22.
+//  Created by Bakai Ismailov on 17/4/22.
 //
 
 import UIKit
 import Kingfisher
 import SDWebImage
 
-class MoviesCollectionViewCell: UICollectionViewCell {
+class UpcomingCollectionViewCell: UICollectionViewCell {
     
     private let imageView = UIImageView()
-    static let identifier = "MoviesCollectionViewCell"
+    static let identifier = "UpcomingCollectionViewCell"
     private var imageBaseURL = AlamofireManager.imageBase
     
     
@@ -32,14 +32,14 @@ class MoviesCollectionViewCell: UICollectionViewCell {
         setupUI()
     }
     
-    public func configure(with model: PopularMoviesCellViewModel){
+    public func configure(with model: UpcomingMoviesCellViewModel){
         guard let url = model.backdropPath else { return }
         setupImages(with: url)
     }
 }
 
 // MARK: - UI Setup
-extension MoviesCollectionViewCell {
+extension UpcomingCollectionViewCell {
     
     private func setupUI() {
         imageView.snp.makeConstraints { maker in
