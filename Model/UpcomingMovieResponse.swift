@@ -12,7 +12,7 @@ import UIKit
 struct UpcomingMoviesResponse: Codable {
     let dates: Dates
     let page: Int
-    let upcomingMovies: [UpcomingMovie]
+    let upcomingMovies: [UpcomingMovies]
     let totalPages, totalResults: Int
 
     enum CodingKeys: String, CodingKey {
@@ -30,7 +30,7 @@ struct Dates: Codable {
 }
 
 // MARK: - UpcomingMovie
-struct UpcomingMovie: Codable {
+struct UpcomingMovies: Codable {
     let adult: Bool
     let backdropPath: String?
     let genreIDS: [Int]
@@ -59,13 +59,4 @@ struct UpcomingMovie: Codable {
         case voteAverage = "vote_average"
         case voteCount = "vote_count"
     }
-}
-
-struct UpcomingMoviesCellViewModel: Codable {
-    let backdropPath: String?
-    let id: Int
-    let overview: String
-    let posterPath: String?
-    let voteAverage: Double
-    let voteCount: Int
 }

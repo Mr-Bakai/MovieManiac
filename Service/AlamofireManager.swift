@@ -22,7 +22,7 @@ class AlamofireManager {
     typealias CompletionPopularMovies = ((Result<PopularMoviesResponse, Error>) -> Void)
     
     typealias CompletionUpcomingMovies = ((Result<UpcomingMoviesResponse, Error>) -> Void)
-    typealias CompletionNowPlayingMovies = (_ response: NowPlayingMoviesResponse?, _ error: Error?) -> ()
+    typealias CompletionNowPlayingMovies = ((Result<NowPlayingMoviesResponse, Error>) -> Void)
     
     // baseURL for TMDB
     private static let baseURLTBDM = "https://api.themoviedb.org/3"
@@ -160,15 +160,15 @@ class AlamofireManager {
                     
                     let decoder = JSONDecoder()
                     let response = try decoder.decode(NowPlayingMoviesResponse.self, from: data)
-                    completion(response, nil)
+                    completion(.success(response))
                     
                 } catch let error {
-                    completion(nil, error)
+                    completion(.failure(error))
                 }
                 
             case .failure(let error):
                 print(error)
-                completion(nil, error)
+                completion(.failure(error))
             }
         }
     }

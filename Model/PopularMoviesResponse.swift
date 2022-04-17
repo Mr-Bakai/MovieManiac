@@ -50,12 +50,3 @@ struct PopularMovies: Codable {
         case voteCount = "vote_count"
     }
 }
-
-struct PopularMoviesCellViewModel {
-    let backdropPath: String?
-    let id: Int
-    let title: String
-    let popularity: Double
-    let voteAverage: Double
-    let voteCount: Int
-}

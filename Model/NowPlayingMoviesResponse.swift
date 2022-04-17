@@ -16,7 +16,7 @@ struct NowPlayingMoviesResponse: Codable {
 
     enum CodingKeys: String, CodingKey {
         case dates, page
-        case nowPlayingMovies = "NowPlayingMovies"
+        case nowPlayingMovies = "results"
         case totalPages = "total_pages"
         case totalResults = "total_results"
     }
@@ -49,4 +49,13 @@ struct NowPlayingMovie: Codable {
         case voteAverage = "vote_average"
         case voteCount = "vote_count"
     }
+}
+
+struct NowPlayingMoviesCellViewModel: Codable {
+    let backdropPath: String?
+    let id: Int
+    let overview: String
+    let posterPath, title: String
+    let voteAverage: Double
+    let voteCount: Int
 }

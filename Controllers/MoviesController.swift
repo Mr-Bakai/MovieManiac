@@ -6,12 +6,11 @@
 
 import UIKit
 
-
 enum BrowseSectionType {
     case topRated(viewModels: [TopRatedMoviesCellViewModel])
     case popular(viewModels: [PopularMoviesCellViewModel])
     case upcoming(viewModels: [UpcomingMoviesCellViewModel])
-    case nowPlaying
+    case nowPlaying(viewModels: [NowPlayingMoviesCellViewModel])
     
     var title: String {
         switch self{
@@ -27,11 +26,7 @@ enum BrowseSectionType {
     }
 }
 
-// Create ViewModels for each model and convert them
-
 class MoviesViewController: UIViewController {
-    
-    private var vm = MoviesViewModel()
     
     private let alamofire = AlamofireManager()
     private var sections = [BrowseSectionType]()
@@ -64,7 +59,7 @@ class MoviesViewController: UIViewController {
     }
     
     private func setupView(){
-        vm.sendMovie = self
+        
         navigationItem.leftBarButtonItem = leftBarButton
         navigationItem.leftBarButtonItem?.tintColor = .gray
         
@@ -76,34 +71,47 @@ class MoviesViewController: UIViewController {
     
     // MARK: - SetUpCollectionView
     private func setupCollectionView(){
-        collectionView.register(MoviesCollectionViewCell.self,
-                                forCellWithReuseIdentifier: MoviesCollectionViewCell.identifier)
+        collectionView.register(PopularMoviesCollectionViewCell.self,
+                                forCellWithReuseIdentifier: PopularMoviesCollectionViewCell.identifier)
      
         collectionView.register(TopRatedMoviesCollectionViewCell.self,
                                 forCellWithReuseIdentifier: TopRatedMoviesCollectionViewCell.identifier)
         
         collectionView.register(UpcomingCollectionViewCell.self, forCellWithReuseIdentifier: UpcomingCollectionViewCell.identifier)
         
+        collectionView.register(NowPlayingMoviesCollectionViewCell.self, forCellWithReuseIdentifier: NowPlayingMoviesCollectionViewCell.identifier)
+        
         collectionView.register(TitleHeaderCollectionReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: TitleHeaderCollectionReusableView.identifier)
         
         collectionView.dataSource = self
         collectionView.delegate = self
-        
     }
     
     private func setupHierarchy(){
         view.addSubview(collectionView)
     }
     
+    // MARK: - Requests
     private func requests(){
         
+        var topRatedMoviesResponse: TopRatedMoviesResponse?
         var popularMoviesResponse: PopularMoviesResponse?
         var upcomingMoviesResponse: UpcomingMoviesResponse?
+        var nowPlayingMoviesResponse: NowPlayingMoviesResponse?
+      
+        alamofire.getTopRatedMovies(endPoint: .topRated, completion: { response in
+            switch response {
+            case .success(let model):
+                topRatedMoviesResponse = model
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+            guard let topRatedMovies = topRatedMoviesResponse?.results else { return }
+            self.configureTopRatedMoviesModel(topRatedMovies: topRatedMovies)
+        })
         
-        vm.getTopRatedMovies()
         
         alamofire.getPopular(endPoint: .popular, completion: { response in
-            
             switch response {
             case .success(let model):
                 popularMoviesResponse = model
@@ -111,7 +119,7 @@ class MoviesViewController: UIViewController {
                 print(error.localizedDescription)
             }
             guard let popularMovies = popularMoviesResponse?.results else { return }
-            self.configureModels(popularMovies: popularMovies)
+            self.configurePopularMoviesModel(popularMovies: popularMovies)
         })
         
         alamofire.getUpcoming(endPoint: .upcoming, completion: { response in
@@ -123,35 +131,41 @@ class MoviesViewController: UIViewController {
             }
             
             guard let upcomingMovies = upcomingMoviesResponse?.upcomingMovies else { return }
-            
-            self.sections.append(.upcoming(viewModels: upcomingMovies.compactMap({
-                return UpcomingMoviesCellViewModel(
-                    backdropPath: $0.posterPath ?? "",
-                    id: $0.id,
-                    overview: $0.overview,
-                    posterPath: $0.posterPath,
-                    voteAverage: $0.voteAverage,
-                    voteCount: $0.voteCount)
-                   
-            })))
-            self.collectionView.reloadData()
+            self.configureUpcomingMoviesModel(upcomingMovies: upcomingMovies)
         })
-
         
-//        alamofire.getNowPlaying(endPoint: .nowPlaying, completion: { (response, error) in
-//            guard let res = response else { return }
-//            self.models.append(res)
-//            self.tableView.reloadData()
-//        })
+        alamofire.getNowPlaying(endPoint: .nowPlaying, completion: { response in
+            switch response {
+            case .success(let model):
+                nowPlayingMoviesResponse = model
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+            
+            guard let nowPlayingMovies = nowPlayingMoviesResponse?.nowPlayingMovies else { return }
+            self.configureNowPlayingMoviesModel(nowPlayingMovies: nowPlayingMovies)
+        })
     }
     
     
     // MARK: - ConfigureModels
-    private func configureModels(popularMovies: [PopularMovies]){
-        
+    private func configureTopRatedMoviesModel(topRatedMovies: [TopRatedMovies]){
+            self.sections.append(.topRated(viewModels: topRatedMovies.compactMap({
+                return TopRatedMoviesCellViewModel(
+                    backdropPath: $0.posterPath,
+                    id: $0.id,
+                    overview: $0.overview,
+                    popularity: $0.popularity,
+                    voteAverage: $0.voteAverage,
+                    voteCount: $0.voteCount)
+            })))
+            self.collectionView.reloadData()
+    }
+    
+    private func configurePopularMoviesModel(popularMovies: [PopularMovies]){
         sections.append(.popular(viewModels: popularMovies.compactMap({
             return PopularMoviesCellViewModel(
-                backdropPath: $0.backdropPath ?? "",
+                backdropPath: $0.posterPath ?? "",
                 id: $0.id,
                 title: $0.title ?? "",
                 popularity: $0.popularity,
@@ -159,6 +173,34 @@ class MoviesViewController: UIViewController {
                 voteCount: $0.voteCount)
         })))
         collectionView.reloadData()
+    }
+    
+    private func configureUpcomingMoviesModel(upcomingMovies: [UpcomingMovies]){
+        self.sections.append(.upcoming(viewModels: upcomingMovies.compactMap({
+            return UpcomingMoviesCellViewModel(
+                backdropPath: $0.posterPath ?? "",
+                id: $0.id,
+                overview: $0.overview,
+                posterPath: $0.posterPath,
+                voteAverage: $0.voteAverage,
+                voteCount: $0.voteCount)
+        })))
+        self.collectionView.reloadData()
+    }
+    
+    private func configureNowPlayingMoviesModel(nowPlayingMovies: [NowPlayingMovie]){
+        self.sections.append(.nowPlaying(viewModels: nowPlayingMovies.compactMap({
+            return NowPlayingMoviesCellViewModel(
+                backdropPath: $0.posterPath,
+                id: $0.id,
+                overview: $0.overview,
+                posterPath: $0.posterPath,
+                title: $0.title,
+                voteAverage: $0.voteAverage,
+                voteCount: $0.voteCount
+            )
+        })))
+        self.collectionView.reloadData()
     }
     
     private func setupLayout(){
@@ -170,10 +212,98 @@ class MoviesViewController: UIViewController {
         let vc = SearchViewController()
         navigationController?.pushViewController(vc, animated: true)
     }
+}
+
+// MARK: - CollectionView
+extension MoviesViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     
-    // MARK: - COMPOSITIONAL LAYOUT
-    static func createSectionLayout(section: Int) -> NSCollectionLayoutSection{
+    func collectionView(_ collectionView: UICollectionView,
+                        numberOfItemsInSection section: Int) -> Int {
+        let model = sections[section]
         
+        // Why Should i switch them
+        switch model {
+        case .topRated(let viewModels):
+            return viewModels.count
+        case .popular(let viewModels):
+            return viewModels.count
+        case .upcoming(let viewModels):
+            return viewModels.count
+        case .nowPlaying(let viewModels):
+            return viewModels.count
+        }
+    }
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return sections.count
+    }
+    
+   //  IndexPath {
+   //        let section: 0
+   //        let row: 4
+   //    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let type = sections[indexPath.section]
+        
+        switch type {
+        
+        case .topRated(let viewModels):
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TopRatedMoviesCollectionViewCell.identifier, for: indexPath) as? TopRatedMoviesCollectionViewCell else {
+                return UICollectionViewCell()
+            }
+            
+            let viewModel = viewModels[indexPath.row]
+            cell.configure(with: viewModel)
+            return cell
+            
+        case .popular(let viewModels):
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PopularMoviesCollectionViewCell.identifier, for: indexPath) as? PopularMoviesCollectionViewCell else {
+                return UICollectionViewCell()
+            }
+            
+            let viewModel = viewModels[indexPath.row]
+            cell.configure(with: viewModel)
+            return cell
+            
+        case .upcoming(let viewModels):
+            
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: UpcomingCollectionViewCell.identifier, for: indexPath) as? UpcomingCollectionViewCell else {
+                return UICollectionViewCell()
+            }
+            
+            let viewModel = viewModels[indexPath.row]
+            cell.configure(with: viewModel)
+            return cell
+            
+        case .nowPlaying(let viewModels):
+            
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NowPlayingMoviesCollectionViewCell.identifier, for: indexPath) as? NowPlayingMoviesCollectionViewCell else {
+                return UICollectionViewCell()
+            }
+            
+            let viewModel = viewModels[indexPath.row]
+            cell.configure(with: viewModel)
+            return cell
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        
+        guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TitleHeaderCollectionReusableView.identifier, for: indexPath) as? TitleHeaderCollectionReusableView, kind == UICollectionView.elementKindSectionHeader else {
+            return UICollectionReusableView()
+        }
+        let section = indexPath.section
+        let title = sections[section].title
+        header.configure(with: title)
+        return header
+    }
+}
+
+// MARK: - COMPOSITIONAL LAYOUT
+extension MoviesViewController {
+    static func createSectionLayout(section: Int) -> NSCollectionLayoutSection{
        let supplementaryViews = [
             NSCollectionLayoutBoundarySupplementaryItem(
                 layoutSize: NSCollectionLayoutSize(
@@ -227,7 +357,7 @@ class MoviesViewController: UIViewController {
             let item = NSCollectionLayoutItem(
                 layoutSize: NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1),
-                    heightDimension: .fractionalWidth(1)
+                    heightDimension: .fractionalHeight(1)
                 )
             )
             
@@ -237,19 +367,19 @@ class MoviesViewController: UIViewController {
             let verticalGroup = NSCollectionLayoutGroup.vertical(
                 layoutSize: NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1),
-                    heightDimension: .fractionalWidth(1)
+                    heightDimension: .fractionalHeight(1)
                 ),
                 subitem: item,
-                count: 2
+                count: 1
             )
             
             let horizontalGroup = NSCollectionLayoutGroup.horizontal(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(0.9),
-                    heightDimension: .fractionalWidth(1)
+                    widthDimension: .fractionalWidth(1.4),
+                    heightDimension: .absolute(250)
                 ),
                 subitem: verticalGroup,
-                count: 1
+                count: 3
             )
             
             // Section
@@ -257,6 +387,7 @@ class MoviesViewController: UIViewController {
             section.orthogonalScrollingBehavior = .groupPaging
             section.boundarySupplementaryItems = supplementaryViews
             return section
+            
             
         case 2:
             
@@ -277,16 +408,52 @@ class MoviesViewController: UIViewController {
                     heightDimension: .fractionalHeight(1)
                 ),
                 subitem: item,
-                count: 2
+                count: 1
             )
             
             let horizontalGroup = NSCollectionLayoutGroup.horizontal(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(0.9),
-                    heightDimension: .absolute(500)
+                    widthDimension: .fractionalWidth(1.4),
+                    heightDimension: .absolute(250)
                 ),
                 subitem: verticalGroup,
+                count: 3
+            )
+            
+            // Section
+            let section = NSCollectionLayoutSection(group: horizontalGroup)
+            section.orthogonalScrollingBehavior = .groupPaging
+            section.boundarySupplementaryItems = supplementaryViews
+            return section
+            
+        case 3:
+            // Item
+            let item = NSCollectionLayoutItem(
+                layoutSize: NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(1),
+                    heightDimension: .fractionalHeight(1)
+                )
+            )
+            
+            item.contentInsets = NSDirectionalEdgeInsets(top: 4,leading: 2,bottom: 4,trailing: 2)
+            
+            // Vertical group in horizontal group
+            let verticalGroup = NSCollectionLayoutGroup.vertical(
+                layoutSize: NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(1),
+                    heightDimension: .fractionalHeight(1)
+                ),
+                subitem: item,
                 count: 1
+            )
+            
+            let horizontalGroup = NSCollectionLayoutGroup.horizontal(
+                layoutSize: NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(1.4),
+                    heightDimension: .absolute(250)
+                ),
+                subitem: verticalGroup,
+                count: 3
             )
             
             // Section
@@ -317,105 +484,5 @@ class MoviesViewController: UIViewController {
             section.boundarySupplementaryItems = supplementaryViews
             return section
         }
-    }
-}
-
-// MARK: - CollectionView
-extension MoviesViewController: UICollectionViewDelegate, UICollectionViewDataSource {
-    
-    func collectionView(_ collectionView: UICollectionView,
-                        numberOfItemsInSection section: Int) -> Int {
-        let model = sections[section]
-        
-        // Why Should i switch them
-        switch model {
-        case .topRated(let viewModels):
-            return viewModels.count
-        case .popular(let viewModels):
-            return viewModels.count
-        case .upcoming(let viewModels):
-            return viewModels.count
-        default:
-            return 0
-        }
-    }
-    
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return sections.count
-    }
-    
-   //  IndexPath {
-   //        let section: 0
-   //        let row: 4
-   //    }
-    
-    func collectionView(_ collectionView: UICollectionView,
-                        cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let type = sections[indexPath.section]
-        
-        switch type {
-        
-        case .topRated(let viewModels):
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TopRatedMoviesCollectionViewCell.identifier, for: indexPath) as? TopRatedMoviesCollectionViewCell else {
-                return UICollectionViewCell()
-            }
-            
-            let viewModel = viewModels[indexPath.row]
-            cell.configure(with: viewModel)
-            return cell
-            
-        case .popular(let viewModels):
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MoviesCollectionViewCell.identifier, for: indexPath) as? MoviesCollectionViewCell else {
-                return UICollectionViewCell()
-            }
-            
-            let viewModel = viewModels[indexPath.row]
-            cell.configure(with: viewModel)
-            return cell
-            
-        case .upcoming(let viewModels):
-            
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: UpcomingCollectionViewCell.identifier, for: indexPath) as? UpcomingCollectionViewCell else {
-                return UICollectionViewCell()
-            }
-            
-            let viewModel = viewModels[indexPath.row]
-            cell.configure(with: viewModel)
-            return cell
-            
-        default:
-            return UICollectionViewCell()
-        }
-    }
-    
-    
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        
-        guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TitleHeaderCollectionReusableView.identifier, for: indexPath) as? TitleHeaderCollectionReusableView, kind == UICollectionView.elementKindSectionHeader else {
-            return UICollectionReusableView()
-        }
-        let section = indexPath.section
-        let title = sections[section].title
-        header.configure(with: title)
-        return header
-    }
-}
-
-
-extension MoviesViewController: DataDelegateProtocol {
-    func movieResponse(movie: TopRatedMoviesResponse) {
-        guard let topRatedMovies = movie.results else { return }
-        
-        sections.append(.topRated(viewModels: topRatedMovies.compactMap({
-            return TopRatedMoviesCellViewModel(
-                backdropPath: $0.posterPath,
-                id: $0.id,
-                overview: $0.overview,
-                popularity: $0.popularity,
-                voteAverage: $0.voteAverage,
-                voteCount: $0.voteCount)
-        })))
-        collectionView.reloadData()
-        // I Need to fix this reload data, find better way of doing it
     }
 }
