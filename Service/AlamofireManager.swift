@@ -8,7 +8,7 @@
 import Foundation
 import Alamofire
 
-enum EndPoint: String {
+enum MoviesEndPoint: String {
     case interestingPhotos = "flickr.interestingness.getList"
     case topRated = "/movie/top_rated"
     case popular = "/movie/popular"
@@ -16,13 +16,22 @@ enum EndPoint: String {
     case nowPlaying = "/movie/now_playing"
 }
 
+enum TVSeriesEndPoint: String {
+    case airingTodayTVSeries = "/tv/airing_today"
+    case popularTVSeries = "/tv/popular"
+}
+
+
 class AlamofireManager {
     
     typealias CompletionTopRatedMovies = ((Result<TopRatedMoviesResponse, Error>) -> Void)
     typealias CompletionPopularMovies = ((Result<PopularMoviesResponse, Error>) -> Void)
-    
     typealias CompletionUpcomingMovies = ((Result<UpcomingMoviesResponse, Error>) -> Void)
     typealias CompletionNowPlayingMovies = ((Result<NowPlayingMoviesResponse, Error>) -> Void)
+    
+    typealias CompletionAiringTodayTVSeries = ((Result<AiringTodayTVSeriesResponse, Error>) -> Void)
+    typealias CompletionPopularTVSeries = ((Result<PopularTVSeriesResponse, Error>) -> Void)
+    
     
     // baseURL for TMDB
     private static let baseURLTBDM = "https://api.themoviedb.org/3"
@@ -33,7 +42,9 @@ class AlamofireManager {
     
     static let imageBase = "https://image.tmdb.org/t/p/w500"
     
-    func getTopRatedMovies(endPoint: EndPoint, completion: @escaping CompletionTopRatedMovies){
+    
+    // MARK: - TopRatedMovies
+    func getTopRatedMovies(endPoint: MoviesEndPoint, completion: @escaping CompletionTopRatedMovies){
         
         let params = ["api_key" : AlamofireManager.apiKeyTBDM ] as [String:Any]
         AF.request(AlamofireManager.baseURLTBDM + endPoint.rawValue,
@@ -42,30 +53,31 @@ class AlamofireManager {
                    encoding: URLEncoding.default,
                    headers: nil, interceptor: nil)
             .response { (responseJSON) in
-            
-            switch responseJSON.result {
-            case .success:
-                print("Success")
-                guard let data = responseJSON.data else { return }
                 
-                do {
+                switch responseJSON.result {
+                case .success:
+                    print("Success")
+                    guard let data = responseJSON.data else { return }
                     
-                    let decoder = JSONDecoder()
-                    let response = try decoder.decode(TopRatedMoviesResponse.self, from: data)
-                    completion(.success(response))
+                    do {
+                        
+                        let decoder = JSONDecoder()
+                        let response = try decoder.decode(TopRatedMoviesResponse.self, from: data)
+                        completion(.success(response))
+                        
+                    } catch let error {
+                        completion(.failure(error))
+                    }
                     
-                } catch let error {
+                case .failure(let error):
+                    print(error)
                     completion(.failure(error))
                 }
-                
-            case .failure(let error):
-                print(error)
-                completion(.failure(error))
             }
-        }
     }
     
-    func getPopular(endPoint: EndPoint, completion: @escaping CompletionPopularMovies){
+    // MARK: - PopularMovies
+    func getPopular(endPoint: MoviesEndPoint, completion: @escaping CompletionPopularMovies){
         
         let params = ["api_key" : AlamofireManager.apiKeyTBDM ] as [String:Any]
         AF.request(AlamofireManager.baseURLTBDM + endPoint.rawValue,
@@ -74,42 +86,42 @@ class AlamofireManager {
                    encoding: URLEncoding.default,
                    headers: nil, interceptor: nil)
             .response { (responseJSON) in
-            
-            switch responseJSON.result {
-            case .success:
-                print("Success")
-                guard let data = responseJSON.data else { return }
-                do {
+                
+                switch responseJSON.result {
+                case .success:
+                    print("Success")
+                    guard let data = responseJSON.data else { return }
+                    do {
+                        
+                        let decoder = JSONDecoder()
+                        let response = try decoder.decode(PopularMoviesResponse.self, from: data)
+                        completion(.success(response))
+                        
+                    } catch let DecodingError.dataCorrupted(context) {
+                        print(context)
+                    } catch let DecodingError.keyNotFound(key, context) {
+                        print("Key '\(key)' not found:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch let DecodingError.valueNotFound(value, context) {
+                        print("Value '\(value)' not found:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch let DecodingError.typeMismatch(type, context)  {
+                        print("Type '\(type)' mismatch:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch {
+                        print("error: ", error)
+                        completion(.failure(error))
+                    }
                     
-                    let decoder = JSONDecoder()
-                    let response = try decoder.decode(PopularMoviesResponse.self, from: data)
-                    print(response)
-                    completion(.success(response))
-                    
-                } catch let DecodingError.dataCorrupted(context) {
-                    print(context)
-                } catch let DecodingError.keyNotFound(key, context) {
-                    print("Key '\(key)' not found:", context.debugDescription)
-                    print("codingPath:", context.codingPath)
-                } catch let DecodingError.valueNotFound(value, context) {
-                    print("Value '\(value)' not found:", context.debugDescription)
-                    print("codingPath:", context.codingPath)
-                } catch let DecodingError.typeMismatch(type, context)  {
-                    print("Type '\(type)' mismatch:", context.debugDescription)
-                    print("codingPath:", context.codingPath)
-                } catch {
-                    print("error: ", error)
+                case .failure(let error):
+                    print(error)
                     completion(.failure(error))
                 }
-                
-            case .failure(let error):
-                print(error)
-                completion(.failure(error))
             }
-        }
     }
     
-    func getUpcoming(endPoint: EndPoint, completion: @escaping CompletionUpcomingMovies){
+    // MARK: - UpcomingMovies
+    func getUpcoming(endPoint: MoviesEndPoint, completion: @escaping CompletionUpcomingMovies){
         
         let params = ["api_key" : AlamofireManager.apiKeyTBDM ] as [String:Any]
         AF.request(AlamofireManager.baseURLTBDM + endPoint.rawValue,
@@ -118,30 +130,31 @@ class AlamofireManager {
                    encoding: URLEncoding.default,
                    headers: nil, interceptor: nil)
             .response { (responseJSON) in
-            
-            switch responseJSON.result {
-            case .success:
-                print("Success")
-                guard let data = responseJSON.data else { return }
                 
-                do {
+                switch responseJSON.result {
+                case .success:
+                    print("Success")
+                    guard let data = responseJSON.data else { return }
                     
-                    let decoder = JSONDecoder()
-                    let response = try decoder.decode(UpcomingMoviesResponse.self, from: data)
-                    completion(.success(response))
+                    do {
+                        
+                        let decoder = JSONDecoder()
+                        let response = try decoder.decode(UpcomingMoviesResponse.self, from: data)
+                        completion(.success(response))
+                        
+                    } catch let error {
+                        completion(.failure(error))
+                    }
                     
-                } catch let error {
+                case .failure(let error):
+                    print(error)
                     completion(.failure(error))
                 }
-                
-            case .failure(let error):
-                print(error)
-                completion(.failure(error))
             }
-        }
     }
     
-    func getNowPlaying(endPoint: EndPoint, completion: @escaping CompletionNowPlayingMovies){
+    // MARK: - NowPlayingMovies
+    func getNowPlaying(endPoint: MoviesEndPoint, completion: @escaping CompletionNowPlayingMovies){
         
         let params = ["api_key" : AlamofireManager.apiKeyTBDM ] as [String:Any]
         AF.request(AlamofireManager.baseURLTBDM + endPoint.rawValue,
@@ -150,26 +163,114 @@ class AlamofireManager {
                    encoding: URLEncoding.default,
                    headers: nil, interceptor: nil)
             .response { (responseJSON) in
-            
-            switch responseJSON.result {
-            case .success:
-                print("Success")
-                guard let data = responseJSON.data else { return }
                 
-                do {
+                switch responseJSON.result {
+                case .success:
+                    print("Success")
+                    guard let data = responseJSON.data else { return }
                     
-                    let decoder = JSONDecoder()
-                    let response = try decoder.decode(NowPlayingMoviesResponse.self, from: data)
-                    completion(.success(response))
+                    do {
+                        
+                        let decoder = JSONDecoder()
+                        let response = try decoder.decode(NowPlayingMoviesResponse.self, from: data)
+                        completion(.success(response))
+                        
+                    } catch let error {
+                        completion(.failure(error))
+                    }
                     
-                } catch let error {
+                case .failure(let error):
+                    print(error)
                     completion(.failure(error))
                 }
-                
-            case .failure(let error):
-                print(error)
-                completion(.failure(error))
             }
-        }
+    }
+    
+    // MARK: - AiringTodayTVSeries
+    func getAiringToday(endPoint: TVSeriesEndPoint, completion: @escaping CompletionAiringTodayTVSeries){
+        
+        let params = ["api_key" : AlamofireManager.apiKeyTBDM] as [String:Any]
+        AF.request(AlamofireManager.baseURLTBDM + endPoint.rawValue,
+                   method: .get,
+                   parameters: params,
+                   encoding: URLEncoding.default,
+                   headers: nil, interceptor: nil)
+            .response { (responseJSON) in
+                
+                switch responseJSON.result {
+                case .success:
+                    print("Success")
+                    guard let data = responseJSON.data else { return }
+                    
+                    do {
+                        
+                        let decoder = JSONDecoder()
+                        let response = try decoder.decode(AiringTodayTVSeriesResponse.self, from: data)
+                        completion(.success(response))
+                        
+                    } catch let DecodingError.dataCorrupted(context) {
+                        print(context)
+                    } catch let DecodingError.keyNotFound(key, context) {
+                        print("Key '\(key)' not found:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch let DecodingError.valueNotFound(value, context) {
+                        print("Value '\(value)' not found:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch let DecodingError.typeMismatch(type, context)  {
+                        print("Type '\(type)' mismatch:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch {
+                        print("error: ", error)
+                        completion(.failure(error))
+                    }
+                case .failure(let error):
+                    print(error)
+                    completion(.failure(error))
+                }
+            }
+    }
+    
+    // MARK: - PopularTVSeries
+    func getPopularTVSeries(endPoint: TVSeriesEndPoint, completion: @escaping CompletionPopularTVSeries){
+        
+        let params = ["api_key" : AlamofireManager.apiKeyTBDM] as [String:Any]
+        AF.request(AlamofireManager.baseURLTBDM + endPoint.rawValue,
+                   method: .get,
+                   parameters: params,
+                   encoding: URLEncoding.default,
+                   headers: nil, interceptor: nil)
+            .response { (responseJSON) in
+                
+                switch responseJSON.result {
+                case .success:
+                    print("Success")
+                    guard let data = responseJSON.data else { return }
+                    
+                    do {
+                        
+                        let decoder = JSONDecoder()
+                        let response = try decoder.decode(PopularTVSeriesResponse.self, from: data)
+                        completion(.success(response))
+                        
+                    } catch let DecodingError.dataCorrupted(context) {
+                        print(context)
+                    } catch let DecodingError.keyNotFound(key, context) {
+                        print("Key '\(key)' not found:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch let DecodingError.valueNotFound(value, context) {
+                        print("Value '\(value)' not found:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch let DecodingError.typeMismatch(type, context)  {
+                        print("Type '\(type)' mismatch:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch {
+                        print("error: ", error)
+                        completion(.failure(error))
+                    }
+                case .failure(let error):
+                    print(error)
+                    completion(.failure(error))
+                }
+            }
     }
 }

@@ -6,7 +6,7 @@
 
 import UIKit
 
-enum BrowseSectionType {
+enum MoviesSectionType {
     case topRated(viewModels: [TopRatedMoviesCellViewModel])
     case popular(viewModels: [PopularMoviesCellViewModel])
     case upcoming(viewModels: [UpcomingMoviesCellViewModel])
@@ -29,7 +29,7 @@ enum BrowseSectionType {
 class MoviesViewController: UIViewController {
     
     private let alamofire = AlamofireManager()
-    private var sections = [BrowseSectionType]()
+    private var sections = [MoviesSectionType]()
     
     lazy var leftBarButton = UIBarButtonItem(image: UIImage(named: "menu"),
                                              style: .plain,
@@ -289,7 +289,9 @@ extension MoviesViewController: UICollectionViewDelegate, UICollectionViewDataSo
         }
     }
     
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+    func collectionView(_ collectionView: UICollectionView,
+                        viewForSupplementaryElementOfKind kind: String,
+                        at indexPath: IndexPath) -> UICollectionReusableView {
         
         guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TitleHeaderCollectionReusableView.identifier, for: indexPath) as? TitleHeaderCollectionReusableView, kind == UICollectionView.elementKindSectionHeader else {
             return UICollectionReusableView()

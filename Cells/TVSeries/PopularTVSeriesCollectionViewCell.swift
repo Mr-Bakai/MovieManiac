@@ -1,21 +1,19 @@
 //
-//  PopularMoviesCollectionViewCell.swift
+//  PopularTVSeriesCollectionViewCell.swift
 //  MovieManiac
 //
-//  Created by Bakai Ismailov on 17/4/22.
+//  Created by Bakai Ismailov on 1/5/22.
 //
 
 import Foundation
-
-
 import UIKit
 import Kingfisher
 import SDWebImage
 
-class PopularMoviesCollectionViewCell: UICollectionViewCell {
+class PopularTVSeriesCollectionViewCell: UICollectionViewCell {
     
     private let imageView = UIImageView()
-    static let identifier = "PopularMoviesCollectionViewCell"
+    static let identifier = "PopularTVSeriesCollectionViewCell"
     private var imageBaseURL = AlamofireManager.imageBase
     
     
@@ -24,7 +22,7 @@ class PopularMoviesCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
         self.contentView.addSubview(imageView)
         imageView.clipsToBounds = true
-        imageView.contentMode = .scaleToFill
+        imageView.contentMode = .scaleAspectFit
     }
     
     required init?(coder: NSCoder) {
@@ -35,14 +33,14 @@ class PopularMoviesCollectionViewCell: UICollectionViewCell {
         setupUI()
     }
     
-    public func configure(with model: PopularMoviesCellViewModel){
-        guard let url = model.backdropPath else { return }
+    public func configure(with model: PopularTVSeriesCellViewModel){
+        guard let url = model.posterPath else { return }
         setupImages(with: url)
     }
 }
 
 // MARK: - UI Setup
-extension PopularMoviesCollectionViewCell {
+extension PopularTVSeriesCollectionViewCell {
     
     private func setupUI() {
         imageView.snp.makeConstraints { maker in
@@ -76,15 +74,7 @@ extension PopularMoviesCollectionViewCell {
         switch result {
         case .success(let retrieveImageResult):
             let image = retrieveImageResult.image
-            let cacheType = retrieveImageResult.cacheType
-            let source = retrieveImageResult.source
-            let originalSource = retrieveImageResult.originalSource
-            
             imageView.image = image
-            print(cacheType)
-            print(source)
-            print(originalSource)
-            
         case .failure(let err):
             print(err)
         }

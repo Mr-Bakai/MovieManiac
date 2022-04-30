@@ -1,18 +1,19 @@
 //
-//  MoviesCollectionViewCell.swift
+//  AiringTodayTVSeriesCollectionViewCell.swift
 //  MovieManiac
 //
-//  Created by Bakai Ismailov on 6/1/22.
+//  Created by Bakai Ismailov on 30/4/22.
 //
 
+import Foundation
 import UIKit
 import Kingfisher
 import SDWebImage
 
-class MoviesCollectionViewCell: UICollectionViewCell {
+class AiringTodayTVSeriesCollectionViewCell: UICollectionViewCell {
     
     private let imageView = UIImageView()
-    static let identifier = "MoviesCollectionViewCell"
+    static let identifier = "AiringTodayTVSeriesCollectionViewCell"
     private var imageBaseURL = AlamofireManager.imageBase
     
     
@@ -21,7 +22,7 @@ class MoviesCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
         self.contentView.addSubview(imageView)
         imageView.clipsToBounds = true
-        imageView.contentMode = .scaleToFill
+        imageView.contentMode = .scaleAspectFit
     }
     
     required init?(coder: NSCoder) {
@@ -32,14 +33,14 @@ class MoviesCollectionViewCell: UICollectionViewCell {
         setupUI()
     }
     
-    public func configure(with model: PopularMoviesCellViewModel){
+    public func configure(with model: AiringTodayTVSeriesCellViewModel){
         guard let url = model.backdropPath else { return }
         setupImages(with: url)
     }
 }
 
 // MARK: - UI Setup
-extension MoviesCollectionViewCell {
+extension AiringTodayTVSeriesCollectionViewCell {
     
     private func setupUI() {
         imageView.snp.makeConstraints { maker in
@@ -73,15 +74,7 @@ extension MoviesCollectionViewCell {
         switch result {
         case .success(let retrieveImageResult):
             let image = retrieveImageResult.image
-            let cacheType = retrieveImageResult.cacheType
-            let source = retrieveImageResult.source
-            let originalSource = retrieveImageResult.originalSource
-            
             imageView.image = image
-            print(cacheType)
-            print(source)
-            print(originalSource)
-            
         case .failure(let err):
             print(err)
         }

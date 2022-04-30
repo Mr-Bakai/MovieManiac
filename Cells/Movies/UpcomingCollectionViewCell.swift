@@ -1,21 +1,18 @@
 //
-//  NowPlayingMoviesCollectionViewCell.swift
+//  UpcomingCollectionViewCell.swift
 //  MovieManiac
 //
 //  Created by Bakai Ismailov on 17/4/22.
 //
 
-import Foundation
-
-
 import UIKit
 import Kingfisher
 import SDWebImage
 
-class NowPlayingMoviesCollectionViewCell: UICollectionViewCell {
+class UpcomingCollectionViewCell: UICollectionViewCell {
     
     private let imageView = UIImageView()
-    static let identifier = "NowPlayingMoviesCollectionViewCell"
+    static let identifier = "UpcomingCollectionViewCell"
     private var imageBaseURL = AlamofireManager.imageBase
     
     
@@ -35,14 +32,14 @@ class NowPlayingMoviesCollectionViewCell: UICollectionViewCell {
         setupUI()
     }
     
-    public func configure(with model: NowPlayingMoviesCellViewModel){
+    public func configure(with model: UpcomingMoviesCellViewModel){
         guard let url = model.backdropPath else { return }
         setupImages(with: url)
     }
 }
 
 // MARK: - UI Setup
-extension NowPlayingMoviesCollectionViewCell {
+extension UpcomingCollectionViewCell {
     
     private func setupUI() {
         imageView.snp.makeConstraints { maker in
@@ -76,14 +73,7 @@ extension NowPlayingMoviesCollectionViewCell {
         switch result {
         case .success(let retrieveImageResult):
             let image = retrieveImageResult.image
-            let cacheType = retrieveImageResult.cacheType
-            let source = retrieveImageResult.source
-            let originalSource = retrieveImageResult.originalSource
-            
             imageView.image = image
-            print(cacheType)
-            print(source)
-            print(originalSource)
             
         case .failure(let err):
             print(err)

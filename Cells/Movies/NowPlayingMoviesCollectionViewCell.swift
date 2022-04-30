@@ -1,18 +1,21 @@
 //
-//  TopRatedMoviesCollectionViewCell.swift
+//  NowPlayingMoviesCollectionViewCell.swift
 //  MovieManiac
 //
-//  Created by Bakai Ismailov on 16/4/22.
+//  Created by Bakai Ismailov on 17/4/22.
 //
+
+import Foundation
+
 
 import UIKit
 import Kingfisher
 import SDWebImage
 
-class TopRatedMoviesCollectionViewCell: UICollectionViewCell {
+class NowPlayingMoviesCollectionViewCell: UICollectionViewCell {
     
     private let imageView = UIImageView()
-    static let identifier = "TopRatedMoviesCollectionViewCell"
+    static let identifier = "NowPlayingMoviesCollectionViewCell"
     private var imageBaseURL = AlamofireManager.imageBase
     
     
@@ -21,7 +24,7 @@ class TopRatedMoviesCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
         self.contentView.addSubview(imageView)
         imageView.clipsToBounds = true
-        imageView.contentMode = .scaleAspectFit
+        imageView.contentMode = .scaleToFill
     }
     
     required init?(coder: NSCoder) {
@@ -32,14 +35,14 @@ class TopRatedMoviesCollectionViewCell: UICollectionViewCell {
         setupUI()
     }
     
-    public func configure(with model: TopRatedMoviesCellViewModel){
+    public func configure(with model: NowPlayingMoviesCellViewModel){
         guard let url = model.backdropPath else { return }
         setupImages(with: url)
     }
 }
 
 // MARK: - UI Setup
-extension TopRatedMoviesCollectionViewCell {
+extension NowPlayingMoviesCollectionViewCell {
     
     private func setupUI() {
         imageView.snp.makeConstraints { maker in
@@ -73,14 +76,7 @@ extension TopRatedMoviesCollectionViewCell {
         switch result {
         case .success(let retrieveImageResult):
             let image = retrieveImageResult.image
-            let cacheType = retrieveImageResult.cacheType
-            let source = retrieveImageResult.source
-            let originalSource = retrieveImageResult.originalSource
-            
             imageView.image = image
-            print(cacheType)
-            print(source)
-            print(originalSource)
             
         case .failure(let err):
             print(err)
