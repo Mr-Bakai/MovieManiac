@@ -19,6 +19,7 @@ enum MoviesEndPoint: String {
 enum TVSeriesEndPoint: String {
     case airingTodayTVSeries = "/tv/airing_today"
     case popularTVSeries = "/tv/popular"
+    case topRatedTVSeries = "/tv/top_rated"
 }
 
 
@@ -31,6 +32,7 @@ class AlamofireManager {
     
     typealias CompletionAiringTodayTVSeries = ((Result<AiringTodayTVSeriesResponse, Error>) -> Void)
     typealias CompletionPopularTVSeries = ((Result<PopularTVSeriesResponse, Error>) -> Void)
+    typealias CompletionTopRatedTVSeries = ((Result<TopRatedTVSeriesResponse, Error>) -> Void)
     
     
     // baseURL for TMDB
@@ -250,6 +252,50 @@ class AlamofireManager {
                         
                         let decoder = JSONDecoder()
                         let response = try decoder.decode(PopularTVSeriesResponse.self, from: data)
+                        completion(.success(response))
+                        
+                    } catch let DecodingError.dataCorrupted(context) {
+                        print(context)
+                    } catch let DecodingError.keyNotFound(key, context) {
+                        print("Key '\(key)' not found:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch let DecodingError.valueNotFound(value, context) {
+                        print("Value '\(value)' not found:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch let DecodingError.typeMismatch(type, context)  {
+                        print("Type '\(type)' mismatch:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch {
+                        print("error: ", error)
+                        completion(.failure(error))
+                    }
+                case .failure(let error):
+                    print(error)
+                    completion(.failure(error))
+                }
+            }
+    }
+    
+    // MARK: - TopRatedTVSeries
+    func getTopRatedTVSeries(endPoint: TVSeriesEndPoint, completion: @escaping CompletionTopRatedTVSeries){
+        
+        let params = ["api_key" : AlamofireManager.apiKeyTBDM] as [String:Any]
+        AF.request(AlamofireManager.baseURLTBDM + endPoint.rawValue,
+                   method: .get,
+                   parameters: params,
+                   encoding: URLEncoding.default,
+                   headers: nil, interceptor: nil)
+            .response { (responseJSON) in
+                
+                switch responseJSON.result {
+                case .success:
+                    print("Success")
+                    guard let data = responseJSON.data else { return }
+                    
+                    do {
+                        
+                        let decoder = JSONDecoder()
+                        let response = try decoder.decode(TopRatedTVSeriesResponse.self, from: data)
                         completion(.success(response))
                         
                     } catch let DecodingError.dataCorrupted(context) {

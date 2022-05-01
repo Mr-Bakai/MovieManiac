@@ -9,6 +9,7 @@ import UIKit
 enum TVSeriesSectionType {
     case airingTodayTVSeries(viewModels: [AiringTodayTVSeriesCellViewModel])
     case popularTVSeries(viewModels: [PopularTVSeriesCellViewModel])
+    case topRatedTVSeries(viewModels: [TopRatedTVSeriesCellViewModel])
     
     var title: String {
         switch self{
@@ -16,6 +17,8 @@ enum TVSeriesSectionType {
             return "Airing Today"
         case .popularTVSeries:
             return "Popular Now"
+        case .topRatedTVSeries:
+            return "Top Rated"
         }
     }
 }
@@ -51,9 +54,17 @@ class SeriesViewController: UIViewController {
     
     // MARK: - SetUpCollectionView
     private func setupCollectionView(){
-        collectionView.register(AiringTodayTVSeriesCollectionViewCell.self, forCellWithReuseIdentifier: AiringTodayTVSeriesCollectionViewCell.identifier)
+        collectionView.register(
+            AiringTodayTVSeriesCollectionViewCell.self,
+            forCellWithReuseIdentifier: AiringTodayTVSeriesCollectionViewCell.identifier)
         
-        collectionView.register(PopularTVSeriesCollectionViewCell.self, forCellWithReuseIdentifier: PopularTVSeriesCollectionViewCell.identifier)
+        collectionView.register(
+            PopularTVSeriesCollectionViewCell.self,
+            forCellWithReuseIdentifier: PopularTVSeriesCollectionViewCell.identifier)
+        
+        collectionView.register(
+            TopRatedTVSeriesCollectionViewCell.self,
+            forCellWithReuseIdentifier: TopRatedTVSeriesCollectionViewCell.identifier)
         
         collectionView.register(TitleHeaderCollectionReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: TitleHeaderCollectionReusableView.identifier)
         
@@ -69,6 +80,7 @@ class SeriesViewController: UIViewController {
     private func requests(){
         var airingTodayTVSeriesResponse: AiringTodayTVSeriesResponse?
         var popularTVSeriesResponse: PopularTVSeriesResponse?
+        var topRatedTVSeriesResponse: TopRatedTVSeriesResponse?
         
         alamofire.getAiringToday(endPoint: .airingTodayTVSeries, completion: { response in
             switch response {
@@ -77,6 +89,7 @@ class SeriesViewController: UIViewController {
             case .failure(let error):
                 print(error.localizedDescription)
             }
+            
             guard let airingTodayTVSeries = airingTodayTVSeriesResponse?.results else { return }
             self.configureAiringTodayTVSeriesModel(airingTodayTVSeries: airingTodayTVSeries)
         })
@@ -93,8 +106,22 @@ class SeriesViewController: UIViewController {
             guard let popularTVSeries = popularTVSeriesResponse?.results else { return }
             self.configurePopularTVSeriesModel(popularTVSeries: popularTVSeries)
         })
+        
+        alamofire.getTopRatedTVSeries(endPoint: .topRatedTVSeries, completion: { response in
+            switch response {
+            case .success(let model):
+                topRatedTVSeriesResponse = model
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+            
+            guard let topRatedTVSeries = topRatedTVSeriesResponse?.results else { return }
+            self.configureTopRatedTVSeries(topRatedTVSeries: topRatedTVSeries)
+        })
     }
     
+    
+    // MARK: -ConfigureModels
     private func configureAiringTodayTVSeriesModel(airingTodayTVSeries: [AiringTodayTVSeries]){
         self.sections.append(.airingTodayTVSeries(viewModels: airingTodayTVSeries.compactMap({
             return AiringTodayTVSeriesCellViewModel(
@@ -108,7 +135,6 @@ class SeriesViewController: UIViewController {
         collectionView.reloadData()
     }
     
-    
     private func configurePopularTVSeriesModel(popularTVSeries: [PopularTVSeries]){
         self.sections.append(.popularTVSeries(viewModels: popularTVSeries.compactMap({
             return PopularTVSeriesCellViewModel(
@@ -117,6 +143,20 @@ class SeriesViewController: UIViewController {
                 overview: $0.overview,
                 popularity: $0.popularity,
                 posterPath: $0.posterPath ,
+                voteAverage: $0.voteAverage,
+                voteCount: $0.voteCount)
+        })))
+        collectionView.reloadData()
+    }
+    
+    private func configureTopRatedTVSeries(topRatedTVSeries: [TopRatedTVSeries]){
+        self.sections.append(.topRatedTVSeries(viewModels: topRatedTVSeries.compactMap({
+            return TopRatedTVSeriesCellViewModel(
+                backdropPath: $0.backdropPath,
+                id: $0.id,
+                overview: $0.overview,
+                popularity: $0.popularity,
+                posterPath: $0.posterPath,
                 voteAverage: $0.voteAverage,
                 voteCount: $0.voteCount)
         })))
@@ -150,6 +190,14 @@ extension SeriesViewController: UICollectionViewDataSource,
             let viewModel = viewModels[indexPath.row]
             cell.configure(with: viewModel)
             return cell
+            
+        case .topRatedTVSeries(let viewModels):
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TopRatedTVSeriesCollectionViewCell.identifier, for: indexPath) as? TopRatedTVSeriesCollectionViewCell else {
+                return UICollectionViewCell()
+            }
+            let viewModel = viewModels[indexPath.row]
+            cell.configure(with: viewModel)
+            return cell
         }
     }
     
@@ -166,7 +214,9 @@ extension SeriesViewController: UICollectionViewDataSource,
         switch model {
         case .airingTodayTVSeries(let viewModels):
             return viewModels.count
-        case .popularTVSeries(viewModels: let viewModels):
+        case .popularTVSeries( let viewModels):
+            return viewModels.count
+        case .topRatedTVSeries(let viewModels):
             return viewModels.count
         }
     }
