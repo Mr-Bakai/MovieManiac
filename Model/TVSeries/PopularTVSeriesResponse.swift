@@ -27,7 +27,7 @@ struct PopularTVSeries: Codable {
     let id: Int
     let name: String
     let originCountry: [String]
-    let originalLanguage: OriginalLanguage
+    let originalLanguage: OriginalLanguagePopularTVSeries
     let originalName, overview: String
     let popularity: Double
     let posterPath: String
@@ -49,7 +49,7 @@ struct PopularTVSeries: Codable {
     }
 }
 
-enum OriginalLanguage: String, Codable {
+enum OriginalLanguagePopularTVSeries: String, Codable {
     case ar = "ar"
     case en = "en"
     case es = "es"

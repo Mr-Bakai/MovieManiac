@@ -56,7 +56,7 @@ extension AiringTodayTVSeriesCollectionViewCell {
     private func setupImages(with imageEndpoint: String){
         
         let URLPath =  imageBaseURL + imageEndpoint
-        guard  let downloadURL = URL(string: URLPath) else { return }
+        guard let downloadURL = URL(string: URLPath) else { return }
 
         let resource = ImageResource(downloadURL: downloadURL)
         let processor = RoundCornerImageProcessor(cornerRadius: 20)

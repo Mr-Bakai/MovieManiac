@@ -210,6 +210,7 @@ class MoviesViewController: UIViewController {
     @objc private func menuTapped(){
         print("Does it? ")
         let vc = SearchViewController()
+        vc.navigationItem.title = "Search"
         navigationController?.pushViewController(vc, animated: true)
     }
 }

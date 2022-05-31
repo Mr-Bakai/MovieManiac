@@ -31,7 +31,7 @@ struct AiringTodayTVSeries: Codable {
     let posterPath: String?
     let voteAverage: Double
     let voteCount: Int
-
+    
     enum CodingKeys: String, CodingKey {
         case backdropPath = "backdrop_path"
         case firstAirDate = "first_air_date"

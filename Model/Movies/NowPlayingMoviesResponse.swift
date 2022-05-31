@@ -7,7 +7,7 @@
 
 import Foundation
 
-// MARK: - NowPlayingMoviesResponse
+
 struct NowPlayingMoviesResponse: Codable {
     let dates: Dates
     let page: Int
@@ -22,7 +22,7 @@ struct NowPlayingMoviesResponse: Codable {
     }
 }
 
-// MARK: - NowPlayingMovie
+
 struct NowPlayingMovie: Codable {
     let adult: Bool
     let backdropPath: String?

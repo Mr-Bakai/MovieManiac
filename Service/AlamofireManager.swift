@@ -22,6 +22,10 @@ enum TVSeriesEndPoint: String {
     case topRatedTVSeries = "/tv/top_rated"
 }
 
+enum OtherEndPoints: String{
+    case popularPeople = "/person/popular"
+    case multiSearch = "/search/multi"
+}
 
 class AlamofireManager {
     
@@ -33,6 +37,9 @@ class AlamofireManager {
     typealias CompletionAiringTodayTVSeries = ((Result<AiringTodayTVSeriesResponse, Error>) -> Void)
     typealias CompletionPopularTVSeries = ((Result<PopularTVSeriesResponse, Error>) -> Void)
     typealias CompletionTopRatedTVSeries = ((Result<TopRatedTVSeriesResponse, Error>) -> Void)
+    typealias CompletionPopularPeopleExplore = ((Result<PopularPeopleExploreResponse, Error>) -> Void)
+    
+    typealias CompletionMultiSearch = ((Result<SearchMultiResponse, Error>) -> Void)
     
     
     // baseURL for TMDB
@@ -43,6 +50,7 @@ class AlamofireManager {
     private static let apiKey = "a6d819499131071f158fd740860a5a88"
     
     static let imageBase = "https://image.tmdb.org/t/p/w500"
+    static let imageBaseW200 = "https://image.tmdb.org/t/p/w200"
     
     
     // MARK: - TopRatedMovies
@@ -313,6 +321,100 @@ class AlamofireManager {
                         print("error: ", error)
                         completion(.failure(error))
                     }
+                case .failure(let error):
+                    print(error)
+                    completion(.failure(error))
+                }
+            }
+    }
+    
+    // MARK: - PopularPeopleExplore
+    func getPopularPeopleExplore(endPoint: OtherEndPoints, completion: @escaping CompletionPopularPeopleExplore){
+        
+        let params = ["api_key" : AlamofireManager.apiKeyTBDM] as [String:Any]
+        AF.request(AlamofireManager.baseURLTBDM + endPoint.rawValue,
+                   method: .get,
+                   parameters: params,
+                   encoding: URLEncoding.default,
+                   headers: nil, interceptor: nil)
+            .response { (responseJSON) in
+                
+                switch responseJSON.result {
+                case .success:
+                    print("Success")
+                    guard let data = responseJSON.data else { return }
+                    
+                    do {
+                        
+                        let decoder = JSONDecoder()
+                        let response = try decoder.decode(PopularPeopleExploreResponse.self, from: data)
+                        completion(.success(response))
+                        
+                    } catch let DecodingError.dataCorrupted(context) {
+                        print(context)
+                    } catch let DecodingError.keyNotFound(key, context) {
+                        print("Key '\(key)' not found:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch let DecodingError.valueNotFound(value, context) {
+                        print("Value '\(value)' not found:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch let DecodingError.typeMismatch(type, context)  {
+                        print("Type '\(type)' mismatch:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch {
+                        print("error: ", error)
+                        completion(.failure(error))
+                    }
+                case .failure(let error):
+                    print(error)
+                    completion(.failure(error))
+                }
+            }
+    }
+    
+    // MARK: - PopularMovies
+    func makeMultiSearch(searchFor with: String,
+                         endPoint: OtherEndPoints,
+                         completion: @escaping CompletionMultiSearch){
+        
+        let params = ["api_key" : AlamofireManager.apiKeyTBDM,"language": "en-US", "query": with] as [String:Any]
+        
+        AF.request(AlamofireManager.baseURLTBDM + endPoint.rawValue,
+                   method: .get,
+                   parameters: params,
+                   encoding: URLEncoding.default,
+                   headers: nil, interceptor: nil)
+            .response { responseJSON in
+                
+                switch responseJSON.result {
+                case .success:
+                    print("SuccessIn Multi Search")
+                    guard let data = responseJSON.data else {
+                        return
+                    }
+                    
+                    do {
+                        let decoder = JSONDecoder()
+                        let response = try decoder.decode(SearchMultiResponse.self, from: data)
+                        
+                        completion(.success(response))
+                        
+                    } catch let DecodingError.dataCorrupted(context) {
+                        print(context)
+                    } catch let DecodingError.keyNotFound(key, context) {
+                        print("Key '\(key)' not found:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch let DecodingError.valueNotFound(value, context) {
+                        print("Value '\(value)' not found:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch let DecodingError.typeMismatch(type, context)  {
+                        print("Type '\(type)' mismatch:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch {
+                        print("error: ", error)
+                        completion(.failure(error))
+                    }
+                    
                 case .failure(let error):
                     print(error)
                     completion(.failure(error))

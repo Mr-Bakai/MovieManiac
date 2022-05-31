@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-// MARK: - UpcomingMoviesResponse
+
 struct UpcomingMoviesResponse: Codable {
     let dates: Dates
     let page: Int
@@ -24,12 +24,10 @@ struct UpcomingMoviesResponse: Codable {
     }
 }
 
-// MARK: - Dates
 struct Dates: Codable {
     let maximum, minimum: String
 }
 
-// MARK: - UpcomingMovie
 struct UpcomingMovies: Codable {
     let adult: Bool
     let backdropPath: String?
