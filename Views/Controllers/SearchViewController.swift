@@ -10,6 +10,7 @@ final class SearchViewController: UIViewController,
                                   UISearchResultsUpdating,
                                   UISearchBarDelegate {
     private let alamofire = AlamofireManager()
+    private var searchResult: [SearchMultiResult] = []
     
     let searchController: UISearchController = {
         let vc = UISearchController(searchResultsController: SearchResultViewController())
@@ -37,7 +38,6 @@ final class SearchViewController: UIViewController,
         let query = searchController.searchBar.text,
               !query.trimmingCharacters(in: .whitespaces).isEmpty else { return }
         
-        
         // MultiSearchResponse is to be fixed
         alamofire.makeMultiSearch(searchFor: query,
                                   endPoint: .multiSearch) { result in
@@ -45,7 +45,7 @@ final class SearchViewController: UIViewController,
                 switch result {
                 case .success(let model):
                     self.sortMultiSearchResponse(sort: model)
-                    print(model)
+                    resultController.update(with: self.searchResult)
                 case .failure(let error):
                     print(error)
                 }
@@ -54,11 +54,11 @@ final class SearchViewController: UIViewController,
     }
     
     func sortMultiSearchResponse(sort response: SearchMultiResponse){
-        var searchResult: [SearchMultiResult] = []
         
         guard let finalResult = response.results else {
             return
         }
+        searchResult.removeAll()
         
         // BETTER: Better way of sorting things out in here
         for movie in finalResult {
@@ -68,7 +68,7 @@ final class SearchViewController: UIViewController,
         }
         
         for tvShow in finalResult {
-            if tvShow.mediaType.rawValue == "tvShow"{
+            if tvShow.mediaType.rawValue == "tv"{
                 searchResult.append(.movie(model: tvShow))
             }
         }

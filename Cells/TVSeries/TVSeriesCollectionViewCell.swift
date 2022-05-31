@@ -1,18 +1,18 @@
 //
-//  MoviesCollectionViewCell.swift
+//  TVSeriesCollectionViewCell.swift
 //  MovieManiac
 //
-//  Created by Bakai Ismailov on 6/1/22.
+//  Created by Bakai Ismailov on 31/5/22.
 //
-
+import Foundation
 import UIKit
 import Kingfisher
 import SDWebImage
 
-class MoviesCollectionViewCell: UICollectionViewCell {
+class TVSeriesCollectionViewCell: UICollectionViewCell {
     
     private let imageView = UIImageView()
-    static let identifier = "MoviesCollectionViewCell"
+    static let identifier = "TVSeriesCollectionViewCell"
     private var imageBaseURL = AlamofireManager.imageBase
     
     
@@ -21,7 +21,7 @@ class MoviesCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
         self.contentView.addSubview(imageView)
         imageView.clipsToBounds = true
-        imageView.contentMode = .scaleToFill
+        imageView.contentMode = .scaleAspectFit
     }
     
     required init?(coder: NSCoder) {
@@ -32,14 +32,14 @@ class MoviesCollectionViewCell: UICollectionViewCell {
         setupUI()
     }
     
-    public func configure(with model: MovieCellViewModel){
-        guard let url = model.backdropPath else { return }
+    public func configure(with model: PopularTVSeriesCellViewModel){
+        guard let url = model.posterPath else { return }
         setupImages(with: url)
     }
 }
 
 // MARK: - UI Setup
-extension MoviesCollectionViewCell {
+extension TVSeriesCollectionViewCell {
     
     private func setupUI() {
         imageView.snp.makeConstraints { maker in
@@ -72,10 +72,8 @@ extension MoviesCollectionViewCell {
         
         switch result {
         case .success(let retrieveImageResult):
-            
             let image = retrieveImageResult.image
             imageView.image = image
-            
         case .failure(let err):
             print(err)
         }
