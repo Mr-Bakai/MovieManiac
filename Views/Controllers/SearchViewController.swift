@@ -69,13 +69,13 @@ final class SearchViewController: UIViewController,
         
         for tvShow in finalResult {
             if tvShow.mediaType.rawValue == "tv"{
-                searchResult.append(.movie(model: tvShow))
+                searchResult.append(.tv(model: tvShow))
             }
         }
         
         for person in finalResult {
             if person.mediaType.rawValue == "person"{
-                searchResult.append(.movie(model: person))
+                searchResult.append(.person(model: person))
             }
         }
     }

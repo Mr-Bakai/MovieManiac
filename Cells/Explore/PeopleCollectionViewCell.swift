@@ -41,17 +41,30 @@ class PeopleCollectionViewCell: UICollectionViewCell {
         setupUI()
     }
     
-    public func configure(with model: PopularPeopleExploreCellViewModel){
-        guard let url = model.profilePath else { return }
-        label.text = model.name ?? ""
+    public func configure(with model: PeopleCellViewModel){
+        guard let url = model.profilePath else {
+            label.text = model.name
+            // James Stalker ===== JS
+            // Here take two full name and take first letters and stick them
+            return
+        }
         setupImages(with: url)
+        label.text = model.name
     }
 }
 
 // MARK: - UI Setup
 extension PeopleCollectionViewCell {
     
+    override func prepareForReuse() {
+        imageView.image = nil
+        label.text = nil
+    }
+    
     private func setupUI() {
+        
+        imageView.backgroundColor = .darkGray
+        imageView.layer.cornerRadius = 5
         
         imageView.snp.makeConstraints { maker in
             maker.height.equalTo(75)
@@ -74,11 +87,10 @@ extension PeopleCollectionViewCell {
         guard let downloadURL = URL(string: URLPath) else { return }
 
         let resource = ImageResource(downloadURL: downloadURL)
-        let processor = RoundCornerImageProcessor(cornerRadius: 50)
-
+        
         self.imageView.kf.indicatorType = .activity
         self.imageView.kf.setImage(with: resource,
-                                   options: [.processor(processor),
+                                   options: [
                                              .cacheSerializer(FormatIndicatedCacheSerializer.png)]) { (result) in
             self.handle(result)
         }

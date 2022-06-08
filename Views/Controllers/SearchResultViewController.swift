@@ -47,7 +47,6 @@ final class SearchResultViewController: UIViewController {
     
     func update(with results: [SearchMultiResult]){
         
-        
         let movies = results.filter({
             switch $0{
             case .movie: return true
@@ -57,14 +56,14 @@ final class SearchResultViewController: UIViewController {
         
         let tv = results.filter({
             switch $0 {
-            case .tvShows: return true
+            case .tv: return true
             default: return false
             }
         })
         
         let person = results.filter({
             switch $0 {
-            case .people: return true
+            case .person: return true
             default: return false
             }
         })
@@ -75,7 +74,6 @@ final class SearchResultViewController: UIViewController {
             SearchSection(title: "Person", results: person),
         ]
         collectionView.reloadData()
-        
     }
 }
 
@@ -104,18 +102,53 @@ extension SearchResultViewController: UICollectionViewDelegate,
             }
             
             let viewModel = MovieCellViewModel(
-                backdropPath: movie.backdropPath,
+                backdropPath: movie.posterPath,
                 id: movie.id,
                 title: movie.title ?? "",
                 popularity: movie.popularity ?? 0.0,
                 voteAverage: movie.voteAverage ?? 0.0,
                 voteCount: movie.voteCount ?? 0
             )
-            
             cell.configure(with: viewModel)
             return cell
             
-        default: return UICollectionViewCell()
+        case .tv(let tvShows):
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TVSeriesCollectionViewCell.identifier, for: indexPath) as? TVSeriesCollectionViewCell else {
+                return UICollectionViewCell()
+            }
+            
+            // BETTER way of doing it
+            let viewModel = TVSeriesCellViewModel(
+                backdropPath: tvShows.posterPath,
+                id: tvShows.id,
+                title: tvShows.title ?? "",
+                popularity: tvShows.popularity ?? 0.0,
+                voteAverage: tvShows.voteAverage ?? 0.0,
+                voteCount: tvShows.voteCount ?? 0
+            )
+            print("=================================")
+            print("=================================")
+            print(viewModel.backdropPath ?? "")
+            cell.configure(with: viewModel)
+            return cell
+            
+        case .person(let people):
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PeopleCollectionViewCell.identifier, for: indexPath) as? PeopleCollectionViewCell else {
+                return UICollectionViewCell()
+            }
+            
+            let viewModel = PeopleCellViewModel(
+                profilePath: people.profilePath,
+                backdropPath: people.backdropPath,
+                id: people.id,
+                name: people.name ?? "",
+                title: people.title ?? "",
+                popularity: people.popularity ?? 0.0,
+                voteAverage: people.voteAverage ?? 0.0,
+                voteCount: people.voteCount ?? 0
+            )
+            cell.configure(with: viewModel)
+            return cell
         }
     }
  
@@ -133,7 +166,6 @@ extension SearchResultViewController: UICollectionViewDelegate,
         header.configure(with: title)
         return header
     }
-    
     
     static func createSectionLayout(section: Int) -> NSCollectionLayoutSection{
         
@@ -153,30 +185,30 @@ extension SearchResultViewController: UICollectionViewDelegate,
             // Item
             let item = NSCollectionLayoutItem(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .fractionalHeight(1.0)
+                    widthDimension: .fractionalWidth(1),
+                    heightDimension: .fractionalHeight(1)
                 )
             )
             
-            item.contentInsets = NSDirectionalEdgeInsets(top: 2,leading: 2,bottom: 2,trailing: 2)
+            item.contentInsets = NSDirectionalEdgeInsets(top: 4,leading: 2, bottom: 4,trailing: 2)
             
             // Vertical group in horizontal group
             let verticalGroup = NSCollectionLayoutGroup.vertical(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .absolute(390)
+                    widthDimension: .fractionalWidth(1),
+                    heightDimension: .fractionalHeight(1)
                 ),
                 subitem: item,
-                count: 3
+                count: 1
             )
             
             let horizontalGroup = NSCollectionLayoutGroup.horizontal(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(0.9),
-                    heightDimension: .absolute(390)
+                    widthDimension: .fractionalWidth(1.4),
+                    heightDimension: .absolute(250)
                 ),
                 subitem: verticalGroup,
-                count: 1
+                count: 3
             )
             
             // Section
@@ -189,35 +221,35 @@ extension SearchResultViewController: UICollectionViewDelegate,
             // Item
             let item = NSCollectionLayoutItem(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .absolute(200),
-                    heightDimension: .absolute(200)
+                    widthDimension: .fractionalWidth(1),
+                    heightDimension: .fractionalHeight(1)
                 )
             )
             
-            item.contentInsets = NSDirectionalEdgeInsets(top: 2,leading: 2,bottom: 2,trailing: 2)
+            item.contentInsets = NSDirectionalEdgeInsets(top: 4,leading: 2,bottom: 4,trailing: 2)
             
             // Vertical group in horizontal group
             let verticalGroup = NSCollectionLayoutGroup.vertical(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .absolute(200),
-                    heightDimension: .absolute(400)
+                    widthDimension: .fractionalWidth(1),
+                    heightDimension: .fractionalHeight(1)
                 ),
                 subitem: item,
-                count: 2
+                count: 1
             )
             
             let horizontalGroup = NSCollectionLayoutGroup.horizontal(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .absolute(200),
-                    heightDimension: .absolute(400)
+                    widthDimension: .fractionalWidth(1.4),
+                    heightDimension: .absolute(250)
                 ),
                 subitem: verticalGroup,
-                count: 1
+                count: 3
             )
             
             // Section
             let section = NSCollectionLayoutSection(group: horizontalGroup)
-            section.orthogonalScrollingBehavior = .continuous
+            section.orthogonalScrollingBehavior = .groupPaging
             section.boundarySupplementaryItems = supplementaryViews
             return section
             
@@ -225,26 +257,38 @@ extension SearchResultViewController: UICollectionViewDelegate,
             // Item
             let item = NSCollectionLayoutItem(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .fractionalHeight(1.0)
+                    widthDimension: .fractionalWidth(1),
+                    heightDimension: .fractionalHeight(1)
                 )
             )
             
-            item.contentInsets = NSDirectionalEdgeInsets(top: 2,leading: 2,bottom: 2,trailing: 2)
+            item.contentInsets = NSDirectionalEdgeInsets(top: 4,leading: 2,bottom: 4,trailing: 2)
             
             // Vertical group in horizontal group
-            let group = NSCollectionLayoutGroup.vertical(
+            let verticalGroup = NSCollectionLayoutGroup.vertical(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .absolute(80)
+                    widthDimension: .fractionalWidth(1),
+                    heightDimension: .fractionalHeight(1)
                 ),
                 subitem: item,
                 count: 1
             )
             
+            let horizontalGroup = NSCollectionLayoutGroup.horizontal(
+                layoutSize: NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(0.9),
+                    heightDimension: .absolute(270)
+                ),
+                subitem: verticalGroup,
+                count: 4
+            )
+            horizontalGroup.interItemSpacing = .fixed(10)
+            
             // Section
-            let section = NSCollectionLayoutSection(group: group)
+            let section = NSCollectionLayoutSection(group: horizontalGroup)
+            section.orthogonalScrollingBehavior = .groupPaging
             section.boundarySupplementaryItems = supplementaryViews
+            section.interGroupSpacing = 10
             return section
             
         default:

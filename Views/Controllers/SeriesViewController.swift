@@ -201,7 +201,6 @@ extension SeriesViewController: UICollectionViewDataSource,
         }
     }
     
-    
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return sections.count
     }

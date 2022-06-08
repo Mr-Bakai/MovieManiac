@@ -31,6 +31,8 @@ class MoviesViewController: UIViewController {
     private let alamofire = AlamofireManager()
     private var sections = [MoviesSectionType]()
     
+    private var topRatedMovies: [TopRatedMovie] = []
+    
     lazy var leftBarButton = UIBarButtonItem(image: UIImage(named: "menu"),
                                              style: .plain,
                                              target: self,
@@ -149,7 +151,7 @@ class MoviesViewController: UIViewController {
     
     
     // MARK: - ConfigureModels
-    private func configureTopRatedMoviesModel(topRatedMovies: [TopRatedMovies]){
+    private func configureTopRatedMoviesModel(topRatedMovies: [TopRatedMovie]){
             self.sections.append(.topRated(viewModels: topRatedMovies.compactMap({
                 return TopRatedMoviesCellViewModel(
                     backdropPath: $0.posterPath,
@@ -160,6 +162,7 @@ class MoviesViewController: UIViewController {
                     voteCount: $0.voteCount)
             })))
             self.collectionView.reloadData()
+            self.topRatedMovies = topRatedMovies
     }
     
     private func configurePopularMoviesModel(popularMovies: [PopularMovies]){
@@ -287,6 +290,29 @@ extension MoviesViewController: UICollectionViewDelegate, UICollectionViewDataSo
             let viewModel = viewModels[indexPath.row]
             cell.configure(with: viewModel)
             return cell
+        }
+    }
+    
+    // you stopped here
+    // MARK: -DID SELECT
+    func collectionView(_ collectionView: UICollectionView,
+                        didSelectItemAt indexPath: IndexPath) {
+        
+        collectionView.deselectItem(at: indexPath, animated: true)
+        let section = sections[indexPath.section]
+        
+        switch section {
+        
+        case .topRated:
+            let movie = topRatedMovies[indexPath.row]
+            let vc = TopRatedMovieDetailViewController(topRatedMovie:
+                movie)
+            vc.title = movie.title
+            vc.navigationItem.largeTitleDisplayMode = .never
+            navigationController?.pushViewController(vc, animated: true)
+            
+        default:
+            break
         }
     }
     

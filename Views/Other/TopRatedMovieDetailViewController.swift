@@ -1,49 +1,51 @@
 //
-//  TVSeriesCollectionViewCell.swift
+//  TopRatedMovieDetailViewController.swift
 //  MovieManiac
 //
-//  Created by Bakai Ismailov on 31/5/22.
+//  Created by Bakai Ismailov on 8/6/22.
 //
+
 import Foundation
 import UIKit
+import SnapKit
 import Kingfisher
-import SDWebImage
 
-class TVSeriesCollectionViewCell: UICollectionViewCell {
+class TopRatedMovieDetailViewController: UIViewController {
     
-    private let imageView = UIImageView()
-    static let identifier = "TVSeriesCollectionViewCell"
+    private let topRatedMovie: TopRatedMovie
     private var imageBaseURL = AlamofireManager.imageBase
     
+    private let imageView: UIImageView = {
+        let image = UIImageView()
+        image.contentMode = .scaleAspectFill
+        return image
+    }()
     
-    // MARK: - Initialization
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        self.contentView.addSubview(imageView)
-        imageView.clipsToBounds = true
-        imageView.contentMode = .scaleAspectFit
+    init(topRatedMovie: TopRatedMovie){
+        self.topRatedMovie = topRatedMovie
+        super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError()
     }
     
-    override func layoutSubviews() {
-        setupUI()
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupView()
+        setupImages(with: topRatedMovie.posterPath)
     }
     
-    public func configure(with model: TVSeriesCellViewModel){
-        print("==============================================This is here tho")
-        guard let url = model.backdropPath else { return }
-        print("==============================================")
-        setupImages(with: url)
+    override func viewDidLayoutSubviews() {
+        setupLayout()
     }
-}
-
-// MARK: - UI Setup
-extension TVSeriesCollectionViewCell {
     
-    private func setupUI() {
+    private func setupView(){
+        view.backgroundColor = .systemBackground
+        view.addSubview(imageView)
+    }
+    
+    private func setupLayout(){
         imageView.snp.makeConstraints { maker in
             maker.height.equalToSuperview()
             maker.width.equalToSuperview()
@@ -53,14 +55,18 @@ extension TVSeriesCollectionViewCell {
             maker.bottom.equalToSuperview()
         }
     }
+}
+
+// MARK: -Extension
+extension TopRatedMovieDetailViewController {
     
     private func setupImages(with imageEndpoint: String){
         
-        let URLPath =  imageBaseURL + imageEndpoint
-        guard  let downloadURL = URL(string: URLPath) else { return }
-
+        let URLPath = imageBaseURL + imageEndpoint
+        guard let downloadURL = URL(string: URLPath) else { return }
+        
         let resource = ImageResource(downloadURL: downloadURL)
-        let processor = RoundCornerImageProcessor(cornerRadius: 20)
+        let processor = RoundCornerImageProcessor(cornerRadius: 50)
 
         self.imageView.kf.indicatorType = .activity
         self.imageView.kf.setImage(with: resource,
