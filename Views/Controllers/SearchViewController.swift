@@ -60,7 +60,7 @@ final class SearchViewController: UIViewController,
         }
         searchResult.removeAll()
         
-        // BETTER: Better way of sorting things out in here
+        // TODO: Better way of sorting things out in here
         for movie in finalResult {
             if movie.mediaType.rawValue == "movie"{
                 searchResult.append(.movie(model: movie))

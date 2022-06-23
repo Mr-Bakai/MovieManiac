@@ -297,22 +297,22 @@ extension SeriesViewController {
             item.contentInsets = NSDirectionalEdgeInsets(top: 4,leading: 2,bottom: 4,trailing: 2)
             
             // Vertical group in horizontal group
-            let verticalGroup = NSCollectionLayoutGroup.vertical(
+            let verticalGroup = NSCollectionLayoutGroup.horizontal(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1),
+                    widthDimension: .fractionalWidth(1.0),
                     heightDimension: .fractionalHeight(1)
                 ),
                 subitem: item,
-                count: 1
+                count: 2
             )
             
-            let horizontalGroup = NSCollectionLayoutGroup.horizontal(
+            let horizontalGroup = NSCollectionLayoutGroup.vertical(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.4),
+                    widthDimension: .fractionalWidth(0.9),
                     heightDimension: .absolute(250)
                 ),
                 subitem: verticalGroup,
-                count: 3
+                count: 1
             )
             
             // Section
@@ -335,22 +335,22 @@ extension SeriesViewController {
             item.contentInsets = NSDirectionalEdgeInsets(top: 4,leading: 2,bottom: 4,trailing: 2)
             
             // Vertical group in horizontal group
-            let verticalGroup = NSCollectionLayoutGroup.vertical(
+            let verticalGroup = NSCollectionLayoutGroup.horizontal(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1),
+                    widthDimension: .fractionalWidth(1.0),
                     heightDimension: .fractionalHeight(1)
                 ),
                 subitem: item,
-                count: 1
+                count: 2
             )
             
-            let horizontalGroup = NSCollectionLayoutGroup.horizontal(
+            let horizontalGroup = NSCollectionLayoutGroup.vertical(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.4),
+                    widthDimension: .fractionalWidth(0.9),
                     heightDimension: .absolute(250)
                 ),
                 subitem: verticalGroup,
-                count: 3
+                count: 1
             )
             
             // Section
@@ -371,22 +371,22 @@ extension SeriesViewController {
             item.contentInsets = NSDirectionalEdgeInsets(top: 4,leading: 2,bottom: 4,trailing: 2)
             
             // Vertical group in horizontal group
-            let verticalGroup = NSCollectionLayoutGroup.vertical(
+            let verticalGroup = NSCollectionLayoutGroup.horizontal(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1),
+                    widthDimension: .fractionalWidth(1.0),
                     heightDimension: .fractionalHeight(1)
                 ),
                 subitem: item,
-                count: 1
+                count: 2
             )
             
-            let horizontalGroup = NSCollectionLayoutGroup.horizontal(
+            let horizontalGroup = NSCollectionLayoutGroup.vertical(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.4),
+                    widthDimension: .fractionalWidth(0.9),
                     heightDimension: .absolute(250)
                 ),
                 subitem: verticalGroup,
-                count: 3
+                count: 1
             )
             
             // Section

@@ -305,8 +305,7 @@ extension MoviesViewController: UICollectionViewDelegate, UICollectionViewDataSo
         
         case .topRated:
             let movie = topRatedMovies[indexPath.row]
-            let vc = TopRatedMovieDetailViewController(topRatedMovie:
-                movie)
+            let vc = TopRatedMovieDetailViewController(movie: movie)
             vc.title = movie.title
             vc.navigationItem.largeTitleDisplayMode = .never
             navigationController?.pushViewController(vc, animated: true)
@@ -333,6 +332,8 @@ extension MoviesViewController: UICollectionViewDelegate, UICollectionViewDataSo
 // MARK: - COMPOSITIONAL LAYOUT
 extension MoviesViewController {
     static func createSectionLayout(section: Int) -> NSCollectionLayoutSection{
+        
+        // TODO: 3rd cell is moved out of bounds of user visibility
        let supplementaryViews = [
             NSCollectionLayoutBoundarySupplementaryItem(
                 layoutSize: NSCollectionLayoutSize(
@@ -385,30 +386,30 @@ extension MoviesViewController {
             // Item
             let item = NSCollectionLayoutItem(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1),
-                    heightDimension: .fractionalHeight(1)
+                    widthDimension: .fractionalWidth(1.0),
+                    heightDimension: .fractionalHeight(1.0)
                 )
             )
             
             item.contentInsets = NSDirectionalEdgeInsets(top: 4,leading: 2,bottom: 4,trailing: 2)
             
             // Vertical group in horizontal group
-            let verticalGroup = NSCollectionLayoutGroup.vertical(
+            let verticalGroup = NSCollectionLayoutGroup.horizontal(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1),
+                    widthDimension: .fractionalWidth(1.0),
                     heightDimension: .fractionalHeight(1)
                 ),
                 subitem: item,
-                count: 1
+                count: 2
             )
             
-            let horizontalGroup = NSCollectionLayoutGroup.horizontal(
+            let horizontalGroup = NSCollectionLayoutGroup.vertical(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.4),
+                    widthDimension: .fractionalWidth(0.9),
                     heightDimension: .absolute(250)
                 ),
                 subitem: verticalGroup,
-                count: 3
+                count: 1
             )
             
             // Section
@@ -431,23 +432,24 @@ extension MoviesViewController {
             item.contentInsets = NSDirectionalEdgeInsets(top: 4,leading: 2,bottom: 4,trailing: 2)
             
             // Vertical group in horizontal group
-            let verticalGroup = NSCollectionLayoutGroup.vertical(
+            let verticalGroup = NSCollectionLayoutGroup.horizontal(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1),
+                    widthDimension: .fractionalWidth(1.0),
                     heightDimension: .fractionalHeight(1)
                 ),
                 subitem: item,
-                count: 1
+                count: 2
             )
             
-            let horizontalGroup = NSCollectionLayoutGroup.horizontal(
+            let horizontalGroup = NSCollectionLayoutGroup.vertical(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.4),
+                    widthDimension: .fractionalWidth(0.9),
                     heightDimension: .absolute(250)
                 ),
                 subitem: verticalGroup,
-                count: 3
+                count: 1
             )
+            
             
             // Section
             let section = NSCollectionLayoutSection(group: horizontalGroup)
@@ -467,23 +469,24 @@ extension MoviesViewController {
             item.contentInsets = NSDirectionalEdgeInsets(top: 4,leading: 2,bottom: 4,trailing: 2)
             
             // Vertical group in horizontal group
-            let verticalGroup = NSCollectionLayoutGroup.vertical(
+            let verticalGroup = NSCollectionLayoutGroup.horizontal(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1),
+                    widthDimension: .fractionalWidth(1.0),
                     heightDimension: .fractionalHeight(1)
                 ),
                 subitem: item,
-                count: 1
+                count: 2
             )
             
-            let horizontalGroup = NSCollectionLayoutGroup.horizontal(
+            let horizontalGroup = NSCollectionLayoutGroup.vertical(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.4),
+                    widthDimension: .fractionalWidth(0.9),
                     heightDimension: .absolute(250)
                 ),
                 subitem: verticalGroup,
-                count: 3
+                count: 1
             )
+            
             
             // Section
             let section = NSCollectionLayoutSection(group: horizontalGroup)
