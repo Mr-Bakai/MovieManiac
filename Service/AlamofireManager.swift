@@ -26,6 +26,7 @@ enum TVSeriesEndPoint: String {
 enum OtherEndPoints: String{
     case popularPeople = "/person/popular"
     case multiSearch = "/search/multi"
+    case topRatedDetailedMovieCast = "/movie/"
 }
 
 class AlamofireManager {
@@ -42,6 +43,7 @@ class AlamofireManager {
     
     typealias CompletionMultiSearch = ((Result<SearchMultiResponse, Error>) -> Void)
     typealias CompletionDetailedMovie = ((Result<DetailedMovieResponse, Error>) -> Void)
+    typealias CompletionTopRatedDetailedMovieCast = ((Result<TopRatedDetailedMovieCastResponse, Error>) -> Void)
     
     
     // baseURL for TMDB
@@ -476,4 +478,58 @@ class AlamofireManager {
         
         
     }
+    
+    
+    
+    // MARK: - TopRatedDetailedMovieCast
+    func getTopRatedDetailedMovieCast(movieId with: Int,
+                         endPoint: OtherEndPoints,
+                         completion: @escaping CompletionTopRatedDetailedMovieCast){
+        
+        let params = ["api_key" : AlamofireManager.apiKeyTBDM] as [String:Any]
+        
+        AF.request(AlamofireManager.baseURLTBDM + endPoint.rawValue + "\(with)" + "/credits",
+                   method: .get,
+                   parameters: params,
+                   encoding: URLEncoding.default,
+                   headers: nil, interceptor: nil)
+            .response { responseJSON in
+                
+                switch responseJSON.result {
+                case .success:
+                    print("SuccessIn DetailedMovie")
+                    guard let data = responseJSON.data else {
+                        return
+                    }
+                    
+                    do {
+                        let decoder = JSONDecoder()
+                        let response = try decoder.decode(TopRatedDetailedMovieCastResponse.self, from: data)
+                        
+                        completion(.success(response))
+                        
+                    } catch let DecodingError.dataCorrupted(context) {
+                        print(context)
+                    } catch let DecodingError.keyNotFound(key, context) {
+                        print("Key '\(key)' not found:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch let DecodingError.valueNotFound(value, context) {
+                        print("Value '\(value)' not found:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch let DecodingError.typeMismatch(type, context)  {
+                        print("Type '\(type)' mismatch:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch {
+                        print("error: ", error)
+                        completion(.failure(error))
+                    }
+                    
+                case .failure(let error):
+                    print(error)
+                    completion(.failure(error))
+                }
+            }
+    }
+    
+    
 }

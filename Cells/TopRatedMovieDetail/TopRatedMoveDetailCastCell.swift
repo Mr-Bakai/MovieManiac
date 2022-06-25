@@ -1,8 +1,8 @@
 //
-//  NowPlayingMoviesCollectionViewCell.swift
+//  TopRatedMoveDetailCastCollectionViewCell.swift
 //  MovieManiac
 //
-//  Created by Bakai Ismailov on 17/4/22.
+//  Created by Bakai Ismailov on 24/6/22.
 //
 
 import Foundation
@@ -10,10 +10,10 @@ import UIKit
 import Kingfisher
 import SDWebImage
 
-class NowPlayingMoviesCollectionViewCell: UICollectionViewCell {
+class TopRatedDetailedMoveCastCollectionViewCell: UICollectionViewCell {
     
     private let imageView = UIImageView()
-    static let identifier = "NowPlayingMoviesCollectionViewCell"
+    static let identifier = "TopRatedMoveDetailCastCollectionViewCell"
     private var imageBaseURL = AlamofireManager.imageBase
     
     
@@ -33,14 +33,14 @@ class NowPlayingMoviesCollectionViewCell: UICollectionViewCell {
         setupUI()
     }
     
-    public func configure(with model: NowPlayingMoviesCellViewModel){
-        guard let url = model.backdropPath else { return }
+    public func configure(with model: TopRatedDetailedMovieCastCellViewModel){
+        guard let url = model.profilePath else { return }
         setupImages(with: url)
     }
 }
 
 // MARK: - UI Setup
-extension NowPlayingMoviesCollectionViewCell {
+extension TopRatedDetailedMoveCastCollectionViewCell {
     
     private func setupUI() {
         imageView.snp.makeConstraints { maker in
