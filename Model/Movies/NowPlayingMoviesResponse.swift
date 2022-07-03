@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 struct NowPlayingMoviesResponse: Codable {
     let dates: Dates
     let page: Int
@@ -21,7 +20,6 @@ struct NowPlayingMoviesResponse: Codable {
         case totalResults = "total_results"
     }
 }
-
 
 struct NowPlayingMovie: Codable {
     let adult: Bool

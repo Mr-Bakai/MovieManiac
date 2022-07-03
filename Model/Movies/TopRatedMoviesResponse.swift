@@ -7,7 +7,6 @@
 
 import Foundation
 
-// MARK: - TopRatedMovies
 struct TopRatedMoviesResponse: Codable {
     let page: Int
     let results: [TopRatedMovie]?
@@ -20,7 +19,6 @@ struct TopRatedMoviesResponse: Codable {
     }
 }
 
-// MARK: - Result
 struct TopRatedMovie: Codable {
     let adult: Bool
     let backdropPath: String

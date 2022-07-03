@@ -424,7 +424,6 @@ class AlamofireManager {
                     completion(.failure(error))
                 }
             }
-        
     }
     
     // MARK: - DetailedMovie
@@ -475,11 +474,7 @@ class AlamofireManager {
                     completion(.failure(error))
                 }
             }
-        
-        
     }
-    
-    
     
     // MARK: - TopRatedDetailedMovieCast
     func getTopRatedDetailedMovieCast(movieId with: Int,
@@ -530,6 +525,4 @@ class AlamofireManager {
                 }
             }
     }
-    
-    
 }

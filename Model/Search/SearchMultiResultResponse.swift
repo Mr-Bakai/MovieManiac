@@ -10,12 +10,6 @@ struct SearchMultiResponse: Codable {
     let page: Int
     let results: [SearchMulti]?
     let total_pages, total_results: Int
-
-//    enum CodingKeys: String, CodingKey {
-//        case page, results
-//        case totalPages = "total_pages"
-//        case totalResults = "total_results"
-//    }
 }
 
 struct SearchMulti: Codable {

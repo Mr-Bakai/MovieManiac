@@ -7,22 +7,13 @@
 
 import Foundation
 
-
-// MARK: - PopularMoviesResponse
 struct PopularMoviesResponse: Codable {
     let page: Int
     let results: [PopularMovies]?
     let total_pages, total_results: Int
 
-//    enum CodingKeys: String, CodingKey {
-//        case page
-//        case popularMovies = "results"
-//        case totalPages = "total_pages"
-//        case totalResults = "total_results"
-//    }
 }
 
-// MARK: - PopularMovie
 struct PopularMovies: Codable {
     let adult: Bool
     let backdropPath: String?

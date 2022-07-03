@@ -8,7 +8,6 @@
 import Foundation
 
 enum SearchMultiResult {
-    // Check this if you can make different model for this (PopularMovies)
     case movie(model: SearchMulti)
     case tv(model: SearchMulti)
     case person(model: SearchMulti)

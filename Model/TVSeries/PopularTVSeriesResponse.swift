@@ -7,7 +7,6 @@
 
 import Foundation
 
-// MARK: - Welcome
 struct PopularTVSeriesResponse: Codable {
     let page: Int
     let results: [PopularTVSeries]
@@ -20,7 +19,6 @@ struct PopularTVSeriesResponse: Codable {
     }
 }
 
-// MARK: - Result
 struct PopularTVSeries: Codable {
     let backdropPath, firstAirDate: String
     let genreIDS: [Int]

@@ -225,7 +225,6 @@ extension MoviesViewController: UICollectionViewDelegate, UICollectionViewDataSo
                         numberOfItemsInSection section: Int) -> Int {
         let model = sections[section]
         
-        // Why Should i switch them
         switch model {
         case .topRated(let viewModels):
             return viewModels.count
@@ -241,11 +240,6 @@ extension MoviesViewController: UICollectionViewDelegate, UICollectionViewDataSo
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return sections.count
     }
-    
-   //  IndexPath {
-   //        let section: 0
-   //        let row: 4
-   //    }
     
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -293,7 +287,6 @@ extension MoviesViewController: UICollectionViewDelegate, UICollectionViewDataSo
         }
     }
     
-    // you stopped here
     // MARK: -DID SELECT
     func collectionView(_ collectionView: UICollectionView,
                         didSelectItemAt indexPath: IndexPath) {
@@ -333,7 +326,6 @@ extension MoviesViewController: UICollectionViewDelegate, UICollectionViewDataSo
 extension MoviesViewController {
     static func createSectionLayout(section: Int) -> NSCollectionLayoutSection{
         
-        // TODO: 3rd cell is moved out of bounds of user visibility
        let supplementaryViews = [
             NSCollectionLayoutBoundarySupplementaryItem(
                 layoutSize: NSCollectionLayoutSize(
@@ -417,7 +409,6 @@ extension MoviesViewController {
             section.orthogonalScrollingBehavior = .groupPaging
             section.boundarySupplementaryItems = supplementaryViews
             return section
-            
             
         case 2:
             

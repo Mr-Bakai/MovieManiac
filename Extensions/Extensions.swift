@@ -83,7 +83,9 @@ extension UILabel {
         let sentenceRange = NSRange(location: 0, length: sentenceText.length)
         var truncatedSentence: NSString = sentenceText
         var endIndex: Int = sentenceRange.upperBound
+        
         let size: CGSize = CGSize(width: self.bounds.width, height: CGFloat.greatestFiniteMagnitude)
+        
         while truncatedSentence.boundingRect(with: size, options: .usesLineFragmentOrigin, attributes: attributes, context: nil).size.height >= fourlineHeight {
             if endIndex == 0 {
                 break

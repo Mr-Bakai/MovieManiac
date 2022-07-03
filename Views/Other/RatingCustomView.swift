@@ -56,7 +56,6 @@ class RatingCustomView: UIView {
         }
         
         label.snp.makeConstraints { maker in
-//            maker.height.width.equalTo(10)
             maker.centerY.equalTo(cView.snp.centerY)
             maker.top.equalTo(cView.snp.top).offset(5)
             maker.right.equalTo(cView.snp.right).inset(5)

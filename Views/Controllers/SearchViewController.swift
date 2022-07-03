@@ -38,7 +38,6 @@ final class SearchViewController: UIViewController,
         let query = searchController.searchBar.text,
               !query.trimmingCharacters(in: .whitespaces).isEmpty else { return }
         
-        // MultiSearchResponse is to be fixed
         alamofire.makeMultiSearch(searchFor: query,
                                   endPoint: .multiSearch) { result in
             DispatchQueue.main.async {

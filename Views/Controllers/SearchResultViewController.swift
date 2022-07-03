@@ -117,7 +117,6 @@ extension SearchResultViewController: UICollectionViewDelegate,
                 return UICollectionViewCell()
             }
             
-            // TODO THIS
             let viewModel = TVSeriesCellViewModel(
                 backdropPath: tvShows.posterPath,
                 id: tvShows.id,
@@ -126,9 +125,6 @@ extension SearchResultViewController: UICollectionViewDelegate,
                 voteAverage: tvShows.voteAverage ?? 0.0,
                 voteCount: tvShows.voteCount ?? 0
             )
-            print("=================================")
-            print("=================================")
-            print(viewModel.backdropPath ?? "")
             cell.configure(with: viewModel)
             return cell
             
