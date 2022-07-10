@@ -3,7 +3,6 @@
 //  MovieManiac
 //
 //  Created by Bakai Ismailov on 29/12/21.
-//
 
 import Foundation
 import UIKit
@@ -83,7 +82,6 @@ class ExploreViewController: UIViewController {
             self.configurePopularPeopleModel(with: popularPeople)
         })
     }
-    
     
     //MARK: -ConfigureModels
     private func configurePopularPeopleModel(with popularPeople: [PopularPeopleExplore]){

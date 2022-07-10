@@ -441,7 +441,6 @@ extension MoviesViewController {
                 count: 1
             )
             
-            
             // Section
             let section = NSCollectionLayoutSection(group: horizontalGroup)
             section.orthogonalScrollingBehavior = .groupPaging

@@ -3,7 +3,6 @@
 //  MovieManiac
 //
 //  Created by Bakai Ismailov on 8/6/22.
-//
 
 import Foundation
 import UIKit
@@ -17,7 +16,7 @@ enum DetailedMovieSectionType {
     var title: String {
         switch self {
         case .overView: return "Overview"
-        case .cast: return "Cast"
+        case .cast: return "Cast and Crew"
         }
     }
 }
@@ -65,11 +64,13 @@ class TopRatedMovieDetailViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.tabBarController?.tabBar.isHidden = true
         self.navigationController?.setNavigationBarHidden(true, animated: animated)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        self.tabBarController?.tabBar.isHidden = false
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
@@ -163,9 +164,9 @@ class TopRatedMovieDetailViewController: UIViewController {
             forCellWithReuseIdentifier: DetailedMovieOverviewCell.identifier)
         
         collectionView.register(
-            DetailedMovieHeaderCollectionReusableCell.self,
+            TitleHeaderCollectionReusableView.self,
             forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-            withReuseIdentifier: DetailedMovieHeaderCollectionReusableCell.identifier
+            withReuseIdentifier: TitleHeaderCollectionReusableView.identifier
         )
         
         collectionView.dataSource = self
@@ -183,6 +184,12 @@ class TopRatedMovieDetailViewController: UIViewController {
     }
 }
 
+// MARK: NavBack
+extension TopRatedMovieDetailViewController: DetailedMovieOverviewCellDelegate {
+    func detailedMovieOverviewCellDidTapBack(_ header: DetailedMovieOverviewCell) {
+        navigationController?.popViewController(animated: true)
+    }
+}
 
 // MARK: - CollectionView
 extension TopRatedMovieDetailViewController: UICollectionViewDelegate,
@@ -196,7 +203,7 @@ extension TopRatedMovieDetailViewController: UICollectionViewDelegate,
                         numberOfItemsInSection section: Int) -> Int {
         let model = sections[section]
         switch model {
-        case .overView(let viewModel):
+        case .overView(_):
             return 1
         case .cast(let viewModel):
             return viewModel.count
@@ -211,9 +218,10 @@ extension TopRatedMovieDetailViewController: UICollectionViewDelegate,
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DetailedMovieOverviewCell.identifier, for: indexPath) as? DetailedMovieOverviewCell else {
                 return UICollectionViewCell()
             }
-            
+            cell.delegate = self
             cell.configure(with: viewModel)
             return cell
+            
         case .cast(let viewModel):
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TopRatedDetailedMoveCastCollectionViewCell.identifier, for: indexPath) as? TopRatedDetailedMoveCastCollectionViewCell else {
                 return UICollectionViewCell()
@@ -225,7 +233,42 @@ extension TopRatedMovieDetailViewController: UICollectionViewDelegate,
         }
     }
     
+    func collectionView(_ collectionView: UICollectionView,
+                        viewForSupplementaryElementOfKind kind: String,
+                        at indexPath: IndexPath) -> UICollectionReusableView {
+        
+        guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TitleHeaderCollectionReusableView.identifier, for: indexPath) as? TitleHeaderCollectionReusableView, kind == UICollectionView.elementKindSectionHeader else {
+            return UICollectionReusableView()
+        }
+        
+        let section = indexPath.section
+        let title = sections[section].title
+        header.configure(with: title)
+        
+        if sections[indexPath.section].title == "Overview" {
+            // TODO: Check if you can change the size of the NSCollectionLayoutBoundarySupplementaryItem dynamically depending on which section you are in
+            header.isHidden = true
+            return header
+        } else {
+            header.isHidden = false
+            return header
+        }
+    }
+}
+
+extension TopRatedMovieDetailViewController {
     static func createSectionLayout(section: Int) -> NSCollectionLayoutSection{
+        
+        let supplementaryViews = [
+             NSCollectionLayoutBoundarySupplementaryItem(
+                 layoutSize: NSCollectionLayoutSize(
+                 widthDimension: .fractionalWidth(1),
+                 heightDimension: .absolute(50)),
+                
+                 elementKind: UICollectionView.elementKindSectionHeader,
+                 alignment: .top
+             )
+         ]
         
         switch section {
         case 0:
@@ -243,7 +286,7 @@ extension TopRatedMovieDetailViewController: UICollectionViewDelegate,
             let horizontalGroup = NSCollectionLayoutGroup.horizontal(
                 layoutSize: NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1),
-                    heightDimension: .absolute(1000)
+                    heightDimension: .absolute(700)
                 ),
                 subitem: item,
                 count: 1
@@ -286,81 +329,8 @@ extension TopRatedMovieDetailViewController: UICollectionViewDelegate,
             
             // Section
             let section = NSCollectionLayoutSection(group: horizontalGroup)
-            section.orthogonalScrollingBehavior = .groupPaging
-            return section
-            
-            
-        case 2:
-            
-            // Item
-            let item = NSCollectionLayoutItem(
-                layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1),
-                    heightDimension: .fractionalHeight(1)
-                )
-            )
-            
-            item.contentInsets = NSDirectionalEdgeInsets(top: 4,leading: 2,bottom: 4,trailing: 2)
-            
-            // Vertical group in horizontal group
-            let verticalGroup = NSCollectionLayoutGroup.horizontal(
-                layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .fractionalHeight(1)
-                ),
-                subitem: item,
-                count: 2
-            )
-            
-            let horizontalGroup = NSCollectionLayoutGroup.vertical(
-                layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(0.9),
-                    heightDimension: .absolute(250)
-                ),
-                subitem: verticalGroup,
-                count: 1
-            )
-            
-            
-            // Section
-            let section = NSCollectionLayoutSection(group: horizontalGroup)
-            section.orthogonalScrollingBehavior = .groupPaging
-            return section
-            
-        case 3:
-            // Item
-            let item = NSCollectionLayoutItem(
-                layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1),
-                    heightDimension: .fractionalHeight(1)
-                )
-            )
-            
-            item.contentInsets = NSDirectionalEdgeInsets(top: 4,leading: 2,bottom: 4,trailing: 2)
-            
-            // Vertical group in horizontal group
-            let verticalGroup = NSCollectionLayoutGroup.horizontal(
-                layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .fractionalHeight(1)
-                ),
-                subitem: item,
-                count: 2
-            )
-            
-            let horizontalGroup = NSCollectionLayoutGroup.vertical(
-                layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(0.9),
-                    heightDimension: .absolute(250)
-                ),
-                subitem: verticalGroup,
-                count: 1
-            )
-            
-            
-            // Section
-            let section = NSCollectionLayoutSection(group: horizontalGroup)
-            section.orthogonalScrollingBehavior = .groupPaging
+            section.orthogonalScrollingBehavior = .continuous
+            section.boundarySupplementaryItems = supplementaryViews
             return section
             
         default:
