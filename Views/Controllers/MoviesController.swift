@@ -28,9 +28,7 @@ enum MoviesSectionType {
 
 class MoviesViewController: UIViewController {
     
-    private let alamofire = AlamofireManager()
     private var sections = [MoviesSectionType]()
-    
     private var topRatedMovies: [TopRatedMovie] = []
     
     lazy var leftBarButton = UIBarButtonItem(image: UIImage(named: "menu"),
@@ -101,7 +99,7 @@ class MoviesViewController: UIViewController {
         var upcomingMoviesResponse: UpcomingMoviesResponse?
         var nowPlayingMoviesResponse: NowPlayingMoviesResponse?
       
-        alamofire.getTopRatedMovies(endPoint: .topRated, completion: { response in
+        AlamofireManager.shared.getTopRatedMovies(endPoint: .topRated, completion: { response in
             switch response {
             case .success(let model):
                 topRatedMoviesResponse = model
@@ -113,7 +111,7 @@ class MoviesViewController: UIViewController {
         })
         
         
-        alamofire.getPopular(endPoint: .popular, completion: { response in
+        AlamofireManager.shared.getPopular(endPoint: .popular, completion: { response in
             switch response {
             case .success(let model):
                 popularMoviesResponse = model
@@ -124,7 +122,7 @@ class MoviesViewController: UIViewController {
             self.configurePopularMoviesModel(popularMovies: popularMovies)
         })
         
-        alamofire.getUpcoming(endPoint: .upcoming, completion: { response in
+        AlamofireManager.shared.getUpcoming(endPoint: .upcoming, completion: { response in
             switch response {
             case .success(let model):
                 upcomingMoviesResponse = model
@@ -136,7 +134,7 @@ class MoviesViewController: UIViewController {
             self.configureUpcomingMoviesModel(upcomingMovies: upcomingMovies)
         })
         
-        alamofire.getNowPlaying(endPoint: .nowPlaying, completion: { response in
+        AlamofireManager.shared.getNowPlaying(endPoint: .nowPlaying, completion: { response in
             switch response {
             case .success(let model):
                 nowPlayingMoviesResponse = model

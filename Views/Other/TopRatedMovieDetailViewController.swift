@@ -29,8 +29,6 @@ class TopRatedMovieDetailViewController: UIViewController {
     private var detailedMovie: DetailedMovieResponse?
     
     private var imageBaseURL = AlamofireManager.imageBase
-    private let alamofire = AlamofireManager()
-    
     
     private let collectionView: UICollectionView = UICollectionView(
         frame: .zero,
@@ -56,7 +54,7 @@ class TopRatedMovieDetailViewController: UIViewController {
         setupHierarchy()
         setupCollectionView()
     }
-   
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         setupLayout()
@@ -74,66 +72,79 @@ class TopRatedMovieDetailViewController: UIViewController {
         self.navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
+    // MARK: SetupView
+    private func setupHierarchy(){
+        view.addSubview(collectionView)
+    }
+    
+    // MARK: SetUpLayout
+    private func setupLayout(){
+        collectionView.frame = view.bounds
+    }
+    
     // MARK: FetchData
     private func fetchData(){
         
         var topRatedDetailedMovieCast: TopRatedDetailedMovieCastResponse?
-            
-        alamofire.getDetailedMovie(movieId: topRatedMovie.id,
+        
+        AlamofireManager.shared.getDetailedMovie(movieId: topRatedMovie.id,
                                    endPoint: .detailedMovie,
                                    completion: { response in
             switch response {
-            case .success(let model):
-                self.sections.append(.overView(viewModel: DetailedMovieOverviewCellViewModel(
-                                                adult: model.adult,
-                                                backdropPath: model.backdropPath,
-                                                budget: model.budget,
-                                                genres: model.genres,
-                                                homepage: model.homepage,
-                                                id: model.id,
-                                                imdbID: model.imdbID,
-                                                originalLanguage: model.originalLanguage,
-                                                originalTitle: model.originalTitle,
-                                                overview: model.overview,
-                                                popularity: model.popularity,
-                                                posterPath: model.posterPath,
-                                                productionCompanies:model.productionCompanies,
-                                                productionCountries:model.productionCountries,
-                                                releaseDate: model.releaseDate,
-                                                revenue: model.revenue,
-                                                runtime: model.runtime,
-                                                spokenLanguages: model.spokenLanguages,
-                                                status: model.status,
-                                                tagline: model.tagline,
-                                                title: model.title,
-                                                video: model.video,
-                                                voteAverage: model.voteAverage,
-                                                voteCount: model.voteCount)))
+            case .success(let detailedMovieModel):
+                self.detailedMovie = detailedMovieModel
+                self.configureTopRatedDetailedMovieCellViewModel(topRatedMovie: detailedMovieModel)
                 
-                self.alamofire.getTopRatedDetailedMovieCast(movieId: model.id,
+                AlamofireManager.shared.getTopRatedDetailedMovieCast(movieId: detailedMovieModel.id,
                                                             endPoint: .topRatedDetailedMovieCast,
                                                             completion: { response in
                     switch response {
-                    case .success(let model):
-                        
-                        topRatedDetailedMovieCast = model
+                    case .success(let castModel):
+                        topRatedDetailedMovieCast = castModel
                         guard let topRatedMovie = topRatedDetailedMovieCast else { return }
-                        self.configureTopRatedDetailedMovieCastCellViewModel(detailedMovie: topRatedMovie)
-                        
+                        self.configureTopRatedDetailedMovieCastCellViewModel(detailedMovieCast: topRatedMovie)
                     case .failure(let error):
                         print(error.localizedDescription)
                     }
                 })
-                
             case .failure(let error):
                 print(error.localizedDescription)
+                self.navigationController?.popViewController(animated: true)
             }
         })
     }
     
-    // MARK: ConfigureModel
-    private func configureTopRatedDetailedMovieCastCellViewModel(detailedMovie movie: TopRatedDetailedMovieCastResponse){
-        sections.append(.cast(viewModel: movie.cast.compactMap({
+    // MARK: ConfigureModels
+    fileprivate func configureTopRatedDetailedMovieCellViewModel(topRatedMovie movie: (DetailedMovieResponse)) {
+        self.sections.append(.overView(viewModel: DetailedMovieOverviewCellViewModel(
+                                        adult: movie.adult,
+                                        backdropPath: movie.backdropPath,
+                                        budget: movie.budget,
+                                        genres: movie.genres,
+                                        homepage: movie.homepage,
+                                        id: movie.id,
+                                        imdbID: movie.imdbID,
+                                        originalLanguage: movie.originalLanguage,
+                                        originalTitle: movie.originalTitle,
+                                        overview: movie.overview,
+                                        popularity: movie.popularity,
+                                        posterPath: movie.posterPath,
+                                        productionCompanies: movie.productionCompanies,
+                                        productionCountries: movie.productionCountries,
+                                        releaseDate: movie.releaseDate,
+                                        revenue: movie.revenue,
+                                        runtime: movie.runtime,
+                                        spokenLanguages: movie.spokenLanguages,
+                                        status: movie.status,
+                                        tagline: movie.tagline,
+                                        title: movie.title,
+                                        video: movie.video,
+                                        voteAverage: movie.voteAverage,
+                                        voteCount: movie.voteCount)))
+    }
+    
+    fileprivate func configureTopRatedDetailedMovieCastCellViewModel(detailedMovieCast movieCast: TopRatedDetailedMovieCastResponse){
+        self.sections.append(.cast(viewModel: movieCast.cast.compactMap({
             return TopRatedDetailedMovieCastCellViewModel(
                 adult: $0.adult,
                 gender: $0.gender,
@@ -172,20 +183,22 @@ class TopRatedMovieDetailViewController: UIViewController {
         collectionView.dataSource = self
         collectionView.delegate = self
     }
-    
-    // MARK: SetupView
-    private func setupHierarchy(){
-        view.addSubview(collectionView)
-    }
-    
-    // MARK: SetUpLayout
-    private func setupLayout(){
-        collectionView.frame = view.bounds
-    }
 }
 
-// MARK: NavBack
-extension TopRatedMovieDetailViewController: DetailedMovieOverviewCellDelegate {
+// MARK: NavBack and PlayVideo
+extension TopRatedMovieDetailViewController: DetailedMovieOverviewCellDidTapBackDelegate,
+                                             DetailedMovieOverviewCellDidTapWatchButtonDelegate {
+    
+    func detailedMovieOverviewCellDidTapWatch(_ header: DetailedMovieOverviewCell) {
+        guard let movie = self.detailedMovie else { return }
+        // TODO: Do not present VideoPlayer controller if there is no video to load
+        // TODO: Do show something if video is nil (hide the button or something like this)
+        let vc = VideoPlayerController(movieId: movie.id)
+        vc.title = movie.title
+        vc.navigationItem.largeTitleDisplayMode = .never
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
     func detailedMovieOverviewCellDidTapBack(_ header: DetailedMovieOverviewCell) {
         navigationController?.popViewController(animated: true)
     }
@@ -218,7 +231,8 @@ extension TopRatedMovieDetailViewController: UICollectionViewDelegate,
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DetailedMovieOverviewCell.identifier, for: indexPath) as? DetailedMovieOverviewCell else {
                 return UICollectionViewCell()
             }
-            cell.delegate = self
+            cell.delegateNavBack = self
+            cell.delegateWatchVideo = self
             cell.configure(with: viewModel)
             return cell
             
@@ -233,6 +247,7 @@ extension TopRatedMovieDetailViewController: UICollectionViewDelegate,
         }
     }
     
+    // MARK: - HeaderView
     func collectionView(_ collectionView: UICollectionView,
                         viewForSupplementaryElementOfKind kind: String,
                         at indexPath: IndexPath) -> UICollectionReusableView {

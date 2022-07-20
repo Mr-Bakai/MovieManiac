@@ -9,15 +9,21 @@ import UIKit
 import Kingfisher
 import SnapKit
 
-protocol DetailedMovieOverviewCellDelegate: AnyObject {
+protocol DetailedMovieOverviewCellDidTapBackDelegate: AnyObject {
     func detailedMovieOverviewCellDidTapBack(_ header: DetailedMovieOverviewCell)
+}
+
+protocol DetailedMovieOverviewCellDidTapWatchButtonDelegate: AnyObject {
+    func detailedMovieOverviewCellDidTapWatch(_ header: DetailedMovieOverviewCell)
 }
 
 final class DetailedMovieOverviewCell: UICollectionViewCell {
     static let identifier = "DetailedMovieOverviewCell"
     
     private var imageBaseURL = AlamofireManager.imageBase
-    weak var delegate: DetailedMovieOverviewCellDelegate?
+    
+    weak var delegateNavBack: DetailedMovieOverviewCellDidTapBackDelegate?
+    weak var delegateWatchVideo: DetailedMovieOverviewCellDidTapWatchButtonDelegate?
     
     private var textDescriptionOfMovie = ""
     
@@ -208,6 +214,7 @@ final class DetailedMovieOverviewCell: UICollectionViewCell {
         synopsisLabel.addGestureRecognizer(labelTap)
         
         backButton.addTarget(self, action: #selector(didTapNavBack), for: .touchUpInside)
+        watchButton.addTarget(self, action: #selector(didTapWatch), for: .touchUpInside)
     }
     
     @objc func didTapReadMoreLess(_ sender: UITapGestureRecognizer) {
@@ -224,7 +231,11 @@ final class DetailedMovieOverviewCell: UICollectionViewCell {
         }
     
     @objc func didTapNavBack(){
-        delegate?.detailedMovieOverviewCellDidTapBack(self)
+        delegateNavBack?.detailedMovieOverviewCellDidTapBack(self)
+    }
+    
+    @objc func didTapWatch(){
+        delegateWatchVideo?.detailedMovieOverviewCellDidTapWatch(self)
     }
     
     required init?(coder: NSCoder) {

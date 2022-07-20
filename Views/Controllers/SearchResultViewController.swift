@@ -147,7 +147,7 @@ extension SearchResultViewController: UICollectionViewDelegate,
             return cell
         }
     }
- 
+    
     // TODO: Remove Sections if empty
     func collectionView(_ collectionView: UICollectionView,
                         viewForSupplementaryElementOfKind kind: String,

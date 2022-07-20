@@ -29,7 +29,13 @@ enum OtherEndPoints: String{
     case topRatedDetailedMovieCast = "/movie/"
 }
 
-class AlamofireManager {
+enum VideoToPlayEndPoint: String {
+    case videoToPlay = "/movie/"
+}
+
+final class AlamofireManager {
+    
+    static let shared = AlamofireManager()
     
     typealias CompletionTopRatedMovies = ((Result<TopRatedMoviesResponse, Error>) -> Void)
     typealias CompletionPopularMovies = ((Result<PopularMoviesResponse, Error>) -> Void)
@@ -44,6 +50,7 @@ class AlamofireManager {
     typealias CompletionMultiSearch = ((Result<SearchMultiResponse, Error>) -> Void)
     typealias CompletionDetailedMovie = ((Result<DetailedMovieResponse, Error>) -> Void)
     typealias CompletionTopRatedDetailedMovieCast = ((Result<TopRatedDetailedMovieCastResponse, Error>) -> Void)
+    typealias CompletionVideoToPlay = ((Result<VideoResponse, Error>) -> Void)
     
     
     // baseURL for TMDB
@@ -103,7 +110,7 @@ class AlamofireManager {
                 
                 switch responseJSON.result {
                 case .success:
-                    print("Success")
+                    print("Success getPopular")
                     guard let data = responseJSON.data else { return }
                     do {
                         
@@ -147,7 +154,7 @@ class AlamofireManager {
                 
                 switch responseJSON.result {
                 case .success:
-                    print("Success")
+                    print("Success getUpcoming")
                     guard let data = responseJSON.data else { return }
                     
                     do {
@@ -180,7 +187,7 @@ class AlamofireManager {
                 
                 switch responseJSON.result {
                 case .success:
-                    print("Success")
+                    print("Success getNowPlaying")
                     guard let data = responseJSON.data else { return }
                     
                     do {
@@ -213,7 +220,7 @@ class AlamofireManager {
                 
                 switch responseJSON.result {
                 case .success:
-                    print("Success")
+                    print("Success getAiringToday")
                     guard let data = responseJSON.data else { return }
                     
                     do {
@@ -257,7 +264,7 @@ class AlamofireManager {
                 
                 switch responseJSON.result {
                 case .success:
-                    print("Success")
+                    print("Success getPopularTVSeries")
                     guard let data = responseJSON.data else { return }
                     
                     do {
@@ -301,7 +308,7 @@ class AlamofireManager {
                 
                 switch responseJSON.result {
                 case .success:
-                    print("Success")
+                    print("Success getTopRatedTVSeries")
                     guard let data = responseJSON.data else { return }
                     
                     do {
@@ -345,7 +352,7 @@ class AlamofireManager {
                 
                 switch responseJSON.result {
                 case .success:
-                    print("Success")
+                    print("Success getPopularPeopleExplore")
                     guard let data = responseJSON.data else { return }
                     
                     do {
@@ -442,7 +449,7 @@ class AlamofireManager {
                 
                 switch responseJSON.result {
                 case .success:
-                    print("SuccessIn DetailedMovie")
+                    print("SuccessIn getDetailedMovie")
                     guard let data = responseJSON.data else {
                         return
                     }
@@ -492,7 +499,7 @@ class AlamofireManager {
                 
                 switch responseJSON.result {
                 case .success:
-                    print("SuccessIn DetailedMovie")
+                    print("SuccessIn getTopRatedDetailedMovieCast")
                     guard let data = responseJSON.data else {
                         return
                     }
@@ -525,4 +532,55 @@ class AlamofireManager {
                 }
             }
     }
+    
+    // MARK: - GetVideoToPlay
+    func getVideoToPlay(movieId with: Int,
+                         endPoint: VideoToPlayEndPoint,
+                         completion: @escaping CompletionVideoToPlay){
+        
+        let params = ["api_key" : AlamofireManager.apiKeyTBDM] as [String:Any]
+        
+        AF.request(AlamofireManager.baseURLTBDM + endPoint.rawValue + "\(with)" + "/videos",
+                   method: .get,
+                   parameters: params,
+                   encoding: URLEncoding.default,
+                   headers: nil, interceptor: nil)
+            .response { responseJSON in
+                
+                switch responseJSON.result {
+                case .success:
+                    print("SuccessIn GetVideToPlay")
+                    guard let data = responseJSON.data else {
+                        return
+                    }
+                    
+                    do {
+                        let decoder = JSONDecoder()
+                        let response = try decoder.decode(VideoResponse.self, from: data)
+                        
+                        completion(.success(response))
+                        
+                    } catch let DecodingError.dataCorrupted(context) {
+                        print(context)
+                    } catch let DecodingError.keyNotFound(key, context) {
+                        print("Key '\(key)' not found:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch let DecodingError.valueNotFound(value, context) {
+                        print("Value '\(value)' not found:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch let DecodingError.typeMismatch(type, context)  {
+                        print("Type '\(type)' mismatch:", context.debugDescription)
+                        print("codingPath:", context.codingPath)
+                    } catch {
+                        print("error: ", error)
+                        completion(.failure(error))
+                    }
+                    
+                case .failure(let error):
+                    print(error)
+                    completion(.failure(error))
+                }
+            }
+    }
+    
 }

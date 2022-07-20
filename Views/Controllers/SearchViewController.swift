@@ -9,7 +9,6 @@ import UIKit
 final class SearchViewController: UIViewController,
                                   UISearchResultsUpdating,
                                   UISearchBarDelegate {
-    private let alamofire = AlamofireManager()
     private var searchResult: [SearchMultiResult] = []
     
     let searchController: UISearchController = {
@@ -38,7 +37,7 @@ final class SearchViewController: UIViewController,
         let query = searchController.searchBar.text,
               !query.trimmingCharacters(in: .whitespaces).isEmpty else { return }
         
-        alamofire.makeMultiSearch(searchFor: query,
+        AlamofireManager.shared.makeMultiSearch(searchFor: query,
                                   endPoint: .multiSearch) { result in
             DispatchQueue.main.async {
                 switch result {

@@ -22,7 +22,7 @@ enum ExploreSectionType{
 }
 
 class ExploreViewController: UIViewController {
-    private let alamofire = AlamofireManager()
+    
     private var sections = [ExploreSectionType]()
     private let collectionView: UICollectionView =
         UICollectionView(
@@ -70,7 +70,7 @@ class ExploreViewController: UIViewController {
     private func request(){
         var popularPeopleExploreResponse: PopularPeopleExploreResponse?
         
-        alamofire.getPopularPeopleExplore(endPoint: .popularPeople, completion: { response in
+        AlamofireManager.shared.getPopularPeopleExplore(endPoint: .popularPeople, completion: { response in
             switch response {
             case .success(let model):
                 popularPeopleExploreResponse = model

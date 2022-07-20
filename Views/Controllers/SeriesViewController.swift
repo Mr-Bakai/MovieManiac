@@ -25,7 +25,6 @@ enum TVSeriesSectionType {
 
 class SeriesViewController: UIViewController {
     
-    private let alamofire = AlamofireManager()
     private var sections = [TVSeriesSectionType]()
     private let collectionView: UICollectionView = UICollectionView (
         frame: .zero,
@@ -82,7 +81,7 @@ class SeriesViewController: UIViewController {
         var popularTVSeriesResponse: PopularTVSeriesResponse?
         var topRatedTVSeriesResponse: TopRatedTVSeriesResponse?
         
-        alamofire.getAiringToday(endPoint: .airingTodayTVSeries, completion: { response in
+        AlamofireManager.shared.getAiringToday(endPoint: .airingTodayTVSeries, completion: { response in
             switch response {
             case .success(let model):
                 airingTodayTVSeriesResponse = model
@@ -95,7 +94,7 @@ class SeriesViewController: UIViewController {
         })
         
         
-        alamofire.getPopularTVSeries(endPoint: .popularTVSeries, completion: { response in
+        AlamofireManager.shared.getPopularTVSeries(endPoint: .popularTVSeries, completion: { response in
             switch response {
             case .success(let model):
                 popularTVSeriesResponse = model
@@ -107,7 +106,7 @@ class SeriesViewController: UIViewController {
             self.configurePopularTVSeriesModel(popularTVSeries: popularTVSeries)
         })
         
-        alamofire.getTopRatedTVSeries(endPoint: .topRatedTVSeries, completion: { response in
+        AlamofireManager.shared.getTopRatedTVSeries(endPoint: .topRatedTVSeries, completion: { response in
             switch response {
             case .success(let model):
                 topRatedTVSeriesResponse = model
