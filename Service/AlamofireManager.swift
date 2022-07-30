@@ -113,11 +113,9 @@ final class AlamofireManager {
                     print("Success getPopular")
                     guard let data = responseJSON.data else { return }
                     do {
-                        
                         let decoder = JSONDecoder()
                         let response = try decoder.decode(PopularMoviesResponse.self, from: data)
                         completion(.success(response))
-                        
                     } catch let DecodingError.dataCorrupted(context) {
                         print(context)
                     } catch let DecodingError.keyNotFound(key, context) {
@@ -133,7 +131,6 @@ final class AlamofireManager {
                         print("error: ", error)
                         completion(.failure(error))
                     }
-                    
                 case .failure(let error):
                     print(error)
                     completion(.failure(error))

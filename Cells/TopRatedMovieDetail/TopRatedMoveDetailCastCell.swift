@@ -8,7 +8,6 @@
 import Foundation
 import UIKit
 import Kingfisher
-import SDWebImage
 
 class TopRatedDetailedMoveCastCollectionViewCell: UICollectionViewCell {
     

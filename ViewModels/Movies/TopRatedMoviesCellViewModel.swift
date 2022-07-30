@@ -8,6 +8,7 @@
 import Foundation
 
 struct TopRatedMoviesCellViewModel: Codable {
+    let title: String?
     let backdropPath: String?
     let id: Int
     let overview: String

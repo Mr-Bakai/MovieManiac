@@ -1,31 +1,22 @@
 //
-//  TopRatedMovieDetailViewController.swift
+//  DetailedMovieController.swift
 //  MovieManiac
 //
-//  Created by Bakai Ismailov on 8/6/22.
+//  Created by Bakai Ismailov on 31/7/22.
+//
 
 import Foundation
 import UIKit
 import SnapKit
 import Kingfisher
 
-enum DetailedMovieSectionType {
-    case overView(viewModel: DetailedMovieOverviewCellViewModel)
-    case cast(viewModel: [TopRatedDetailedMovieCastCellViewModel])
-    
-    var title: String {
-        switch self {
-        case .overView: return "Overview"
-        case .cast: return "Cast and Crew"
-        }
-    }
-}
 
-class TopRatedMovieDetailViewController: UIViewController {
+//TODO: Try Making it Generic
+class DetailedMovieController: UIViewController {
     
     private var sections = [DetailedMovieSectionType]()
     
-    private var topRatedMovie: TopRatedMoviesCellViewModel
+    private var topRatedMovie: PopularMoviesCellViewModel
     private var detailedMovie: DetailedMovieResponse?
     
     private var imageBaseURL = AlamofireManager.imageBase
@@ -34,10 +25,10 @@ class TopRatedMovieDetailViewController: UIViewController {
         frame: .zero,
         collectionViewLayout: UICollectionViewCompositionalLayout{ sectionIndex, _ ->
         NSCollectionLayoutSection? in
-        return TopRatedMovieDetailViewController.createSectionLayout(section: sectionIndex)
+        return DetailedMovieController.createSectionLayout(section: sectionIndex)
     })
     
-    init(movie: TopRatedMoviesCellViewModel) {
+    init(movie: PopularMoviesCellViewModel) {
         self.topRatedMovie = movie
         self.detailedMovie = nil
         super.init(nibName: nil, bundle: nil)
@@ -186,7 +177,7 @@ class TopRatedMovieDetailViewController: UIViewController {
 }
 
 // MARK: NavBack and PlayVideo
-extension TopRatedMovieDetailViewController: DetailedMovieOverviewCellDidTapBackDelegate,
+extension DetailedMovieController: DetailedMovieOverviewCellDidTapBackDelegate,
                                              DetailedMovieOverviewCellDidTapWatchButtonDelegate {
     
     func detailedMovieOverviewCellDidTapWatch(_ header: DetailedMovieOverviewCell) {
@@ -205,7 +196,7 @@ extension TopRatedMovieDetailViewController: DetailedMovieOverviewCellDidTapBack
 }
 
 // MARK: - CollectionView
-extension TopRatedMovieDetailViewController: UICollectionViewDelegate,
+extension DetailedMovieController: UICollectionViewDelegate,
                                              UICollectionViewDataSource{
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -271,7 +262,7 @@ extension TopRatedMovieDetailViewController: UICollectionViewDelegate,
     }
 }
 
-extension TopRatedMovieDetailViewController {
+extension DetailedMovieController {
     static func createSectionLayout(section: Int) -> NSCollectionLayoutSection{
         
         let supplementaryViews = [
