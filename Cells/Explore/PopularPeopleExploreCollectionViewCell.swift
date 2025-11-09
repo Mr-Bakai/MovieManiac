@@ -70,12 +70,11 @@ extension PopularPeopleExploreCollectionViewCell {
         
         let URLPath = imageBaseURL + imageEndpoint
         guard let downloadURL = URL(string: URLPath) else { return }
-
-        let resource = ImageResource(downloadURL: downloadURL)
+        
         let processor = RoundCornerImageProcessor(cornerRadius: 50)
 
         self.imageView.kf.indicatorType = .activity
-        self.imageView.kf.setImage(with: resource,
+        self.imageView.kf.setImage(with: downloadURL,
                                    options: [.processor(processor),
                                              .cacheSerializer(FormatIndicatedCacheSerializer.png)]) { (result) in
             self.handle(result)
@@ -87,6 +86,7 @@ extension PopularPeopleExploreCollectionViewCell {
         switch result {
         case .success(let retrieveImageResult):
             let image = retrieveImageResult.image
+            
             imageView.image = image
         case .failure(let err):
             print(err)

@@ -296,8 +296,6 @@ extension TopRatedMovieDetailViewController {
             )
             
             item.contentInsets = NSDirectionalEdgeInsets(top: 2,leading: 1,bottom: 2,trailing: 1)
-
-            
             let horizontalGroup = NSCollectionLayoutGroup.horizontal(
                 layoutSize: NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1),
@@ -320,7 +318,6 @@ extension TopRatedMovieDetailViewController {
                     heightDimension: .fractionalHeight(1.0)
                 )
             )
-            
             item.contentInsets = NSDirectionalEdgeInsets(top: 4,leading: 2,bottom: 4,trailing: 2)
             
             // Vertical group in horizontal group

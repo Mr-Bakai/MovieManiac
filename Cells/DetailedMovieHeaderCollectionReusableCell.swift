@@ -392,10 +392,8 @@ extension DetailedMovieHeaderCollectionReusableCell {
         let URLPath = imageBaseURL + imageEndpoint
         guard let downloadURL = URL(string: URLPath) else { return }
         
-        let resource = ImageResource(downloadURL: downloadURL)
-        
         self.imageView.kf.indicatorType = .activity
-        self.imageView.kf.setImage(with: resource,
+        self.imageView.kf.setImage(with: downloadURL,
                                    options: [
                                              .cacheSerializer(FormatIndicatedCacheSerializer.png)]) { (result) in
             self.handle(result)

@@ -57,11 +57,10 @@ extension TopRatedTVSeriesCollectionViewCell {
         let URLPath =  imageBaseURL + imageEndpoint
         guard  let downloadURL = URL(string: URLPath) else { return }
 
-        let resource = ImageResource(downloadURL: downloadURL)
         let processor = RoundCornerImageProcessor(cornerRadius: 20)
 
         self.imageView.kf.indicatorType = .activity
-        self.imageView.kf.setImage(with: resource,
+        self.imageView.kf.setImage(with: downloadURL,
                                    options: [.processor(processor),
                                              .cacheSerializer(FormatIndicatedCacheSerializer.png)]) { (result) in
             self.handle(result)

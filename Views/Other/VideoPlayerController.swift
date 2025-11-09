@@ -44,6 +44,9 @@ class VideoPlayerController: UIViewController, YTPlayerViewDelegate {
             switch response {
             case .success(let model):
                 self.setupVideoKey(modelToPlay: model)
+                
+                print("🌞🌞🌞🌞🌞🌞🌞 \(model)")
+                
             case .failure(let error):
                 print(error)
             }
@@ -75,6 +78,8 @@ class VideoPlayerController: UIViewController, YTPlayerViewDelegate {
         guard !video.results.isEmpty else { return }
         self.playerView.load(withVideoId: video.results[0].key,
                              playerVars: ["playsinline":0])
+        
+        print(video.results[0].key)
         print(video.results[0].site)
     }
 }

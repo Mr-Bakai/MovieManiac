@@ -127,7 +127,6 @@ class MoviesViewController: UIViewController {
     }
     
     @objc private func menuTapped(){
-        print("Does it? ")
         let vc = SearchViewController()
         vc.navigationItem.title = "Search"
         navigationController?.pushViewController(vc, animated: true)
@@ -137,10 +136,13 @@ class MoviesViewController: UIViewController {
 // MARK: - CollectionView
 extension MoviesViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return sections.count
+    }
+    
     func collectionView(_ collectionView: UICollectionView,
                         numberOfItemsInSection section: Int) -> Int {
         let model = sections[section]
-        
         switch model {
         case .topRated(let viewModels):
             return viewModels.count
@@ -152,11 +154,7 @@ extension MoviesViewController: UICollectionViewDelegate, UICollectionViewDataSo
             return viewModels.count
         }
     }
-    
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return sections.count
-    }
-    
+   
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let type = sections[indexPath.section]
@@ -231,7 +229,6 @@ extension MoviesViewController: UICollectionViewDelegate, UICollectionViewDataSo
     func collectionView(_ collectionView: UICollectionView,
                         viewForSupplementaryElementOfKind kind: String,
                         at indexPath: IndexPath) -> UICollectionReusableView {
-        
         guard let header = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
                 withReuseIdentifier: TitleHeaderCollectionReusableView.identifier,

@@ -83,7 +83,7 @@ class MainViewModel {
                 backdropPath: $0.posterPath ?? "",
                 id: $0.id ,
                 title: $0.title ?? "",
-                popularity: $0.popularity ,
+                popularity: $0.popularity,
                 voteAverage: $0.voteAverage,
                 voteCount: $0.voteCount)
         })

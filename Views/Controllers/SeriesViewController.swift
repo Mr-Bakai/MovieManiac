@@ -33,7 +33,6 @@ class SeriesViewController: UIViewController {
         return SeriesViewController.createSectionLayoutForSeriesVC(section: sectionIndex)
     })
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
@@ -65,7 +64,9 @@ class SeriesViewController: UIViewController {
             TopRatedTVSeriesCollectionViewCell.self,
             forCellWithReuseIdentifier: TopRatedTVSeriesCollectionViewCell.identifier)
         
-        collectionView.register(TitleHeaderCollectionReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: TitleHeaderCollectionReusableView.identifier)
+        collectionView.register(TitleHeaderCollectionReusableView.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                withReuseIdentifier: TitleHeaderCollectionReusableView.identifier)
         
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -223,7 +224,10 @@ extension SeriesViewController: UICollectionViewDataSource,
                         viewForSupplementaryElementOfKind kind: String,
                         at indexPath: IndexPath) -> UICollectionReusableView {
         
-        guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TitleHeaderCollectionReusableView.identifier, for: indexPath) as? TitleHeaderCollectionReusableView, kind == UICollectionView.elementKindSectionHeader else {
+        guard let header = collectionView.dequeueReusableSupplementaryView(
+            ofKind: kind,
+            withReuseIdentifier: TitleHeaderCollectionReusableView.identifier,
+            for: indexPath) as? TitleHeaderCollectionReusableView, kind == UICollectionView.elementKindSectionHeader else {
             return UICollectionReusableView()
         }
         let section = indexPath.section

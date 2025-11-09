@@ -579,5 +579,4 @@ final class AlamofireManager {
                 }
             }
     }
-    
 }
